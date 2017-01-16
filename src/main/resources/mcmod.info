@@ -1,0 +1,17 @@
+[
+{
+"modid": "pogostick",
+"name": "Pogo Sticks",
+"description": "Adds a pogo stick.",
+"version": "${version}",
+"mcversion": "${mcversion}",
+"url": "",
+"updateUrl": "",
+"authorList": [ "sidben" ],
+"credits": "",
+"logoFile": "",
+"screenshots": [ ],
+"parent": "",
+"dependencies": [ ]
+}
+]
