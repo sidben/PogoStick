@@ -22,7 +22,7 @@ public class ItemPogoStick extends Item
         this.setUnlocalizedName("pogo_stick");
         this.setRegistryName("pogo_stick");
         this.setCreativeTab(CreativeTabs.TRANSPORTATION);
-        this.setMaxDamage(300);
+        this.setMaxDamage(720);
     }
 
 

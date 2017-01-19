@@ -7,6 +7,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.math.BlockPos;
@@ -71,6 +72,8 @@ public class PlayerEventHandler
 
         if (entity instanceof EntityPlayer) {
             LogHelper.info("onLivingFallEvent()");
+            LogHelper.info("    is remote:     " + entity.world.isRemote);
+            LogHelper.info("    using pogo:    " + isEntityUsingPogoStick(entity));
             LogHelper.info("    distance:      " + event.getDistance());
             LogHelper.info("    dmg mult:      " + event.getDamageMultiplier());
             LogHelper.info("    entity:        " + event.getEntityLiving());
@@ -121,12 +124,12 @@ public class PlayerEventHandler
         EntityLivingBase entity = event.player;
         EntityLandingTracker tracker = EntityLandingTracker.EMPTY;
 
-        if (!entity.world.isRemote) return;
+        // if (!entity.world.isRemote) return;
 
         
         
         if (event.phase == Phase.START && entity != null) {
-            LogHelper.info(String.format("onPlayerTickEvent() S  - forward %.4f / strafe %.4f / motionX %.4f / motionZ %.4f", entity.moveForward, entity.moveStrafing, entity.motionX, entity.motionZ));
+            //LogHelper.info(String.format("onPlayerTickEvent() S  - forward %.4f / strafe %.4f / motionX %.4f / motionZ %.4f", entity.moveForward, entity.moveStrafing, entity.motionX, entity.motionZ));
             
             if (isEntityUsingPogoStick(entity) && entity instanceof EntityPlayer) {
             }
@@ -135,7 +138,7 @@ public class PlayerEventHandler
         
         
         if (event.phase == Phase.END && entity != null) {
-            LogHelper.info(String.format("onPlayerTickEvent() E  - forward %.4f / strafe %.4f / motionX %.4f / motionZ %.4f", entity.moveForward, entity.moveStrafing, entity.motionX, entity.motionZ));
+            //LogHelper.info(String.format("onPlayerTickEvent() E  - forward %.4f / strafe %.4f / motionX %.4f / motionZ %.4f", entity.moveForward, entity.moveStrafing, entity.motionX, entity.motionZ));
 
             
             
@@ -148,7 +151,7 @@ public class PlayerEventHandler
                 
                 blockpos$pooledmutableblockpos.release();
                 
-                LogHelper.info(String.format("                         Block slipperness %.6f / Friction %.6f", f6, f8));
+                //LogHelper.info(String.format("                         Block slipperness %.6f / Friction %.6f", f6, f8));
             }
             
             
@@ -205,8 +208,8 @@ public class PlayerEventHandler
 
             
             //LogHelper.info(String.format("                         g %.6f / %b / gA %.6f / gB %.6f / g1 %.6f / g2 %.6f / gx1 %.3f / gz1 %.3f", g, (g >= 1.0E-4F), gA, gB, g1, g2, gx1, gz1));
-            LogHelper.info(String.format("                         g %.6f / gx %.6f / gz %.6f", g, gx1, gz1));
-            LogHelper.info(String.format("                         h %.6f / hx %.6f / hz %.6f", h, hx1, hz1));
+            //LogHelper.info(String.format("                         g %.6f / gx %.6f / gz %.6f", g, gx1, gz1));
+            //LogHelper.info(String.format("                         h %.6f / hx %.6f / hz %.6f", h, hx1, hz1));
 
             
             
@@ -233,10 +236,16 @@ public class PlayerEventHandler
     
     private void bouncesEntity(EntityLivingBase entity, EntityLandingTracker tracker) {
         if (tracker != EntityLandingTracker.EMPTY && tracker.getBounceMotionY() > 0.0D) {
-            entity.fallDistance = 0.0F;
+            //entity.fallDistance = 0.0F;
             entity.motionY = tracker.getBounceMotionY();
             entity.isAirBorne = true;
             entity.onGround = false;
+
+            if (!entity.world.isRemote) {
+                tracker.getItemStack().damageItem(1, entity);       // TODO: dmg item based on distance fallen (max 3 dmg?)
+            } else {
+                entity.playSound(SoundEvents.ENTITY_SLIME_JUMP, 0.8F, 0.8F + entity.world.rand.nextFloat() * 0.4F);                
+            }
         }
     }
     

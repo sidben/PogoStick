@@ -53,16 +53,28 @@ public class BounceManager
             if (_fallenEntities.containsKey(entity)) {
                 LogHelper.info("popEntity(" + entity + ") - #" + _fallenEntities.size());
                 
-                tracker = _fallenEntities.get(entity);
-                _fallenEntities.remove(entity);
+                EntityLandingTracker peekTracker = _fallenEntities.get(entity);
+                if (peekTracker.tickDelay <= 0) {
+                    _fallenEntities.remove(entity);
+                    tracker = peekTracker;
+                } else {
+                    peekTracker.tickDelay--;
+                }
             }
         } else {
             // LogHelper.info("popEntity(" + entity + ") - local");
-            tracker = _localFallenEntities;
-            _localFallenEntities = EntityLandingTracker.EMPTY;
+            EntityLandingTracker peekTracker = _localFallenEntities;
+            if (peekTracker.tickDelay <= 0) {
+                _localFallenEntities = EntityLandingTracker.EMPTY;
+                tracker = peekTracker;
+            } else {
+                peekTracker.tickDelay--;
+            }
+            
         }
 
         
+        // TODO: refactor and optimize
         return tracker;
     }
 
