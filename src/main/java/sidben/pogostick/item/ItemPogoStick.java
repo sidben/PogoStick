@@ -57,7 +57,7 @@ public class ItemPogoStick extends Item
     @Override
     public EnumAction getItemUseAction(ItemStack stack)
     {
-        return EnumAction.BLOCK;
+        return EnumAction.NONE;
     }
 
     /**
@@ -66,16 +66,18 @@ public class ItemPogoStick extends Item
     @Override
     public int getMaxItemUseDuration(ItemStack stack)
     {
-        return 72000;
+        return 72000;       // Same as shield, but may be limited
     }
 
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
+        /*
         LogHelper.info("onItemRightClick()");
         LogHelper.info("  hand: " + handIn);
         LogHelper.info("  player: " + playerIn);
+        */
         
         final ItemStack itemstack = playerIn.getHeldItem(handIn);
         playerIn.setActiveHand(handIn);

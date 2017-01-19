@@ -2,6 +2,7 @@ package sidben.pogostick.proxy;
 
 import net.minecraftforge.common.MinecraftForge;
 import sidben.pogostick.helper.ItemsHelper;
+import sidben.pogostick.handler.PlayerEventHandler;
 
 
 /*
@@ -14,14 +15,16 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void pre_initialize()
     {
+        // Register items
+        ItemsHelper.register();
     }
 
 
     @Override
     public void initialize()
     {
-        // Register items
-        ItemsHelper.register();
+        // Event Handlers
+        MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
     }
 
 

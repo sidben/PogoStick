@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import sidben.pogostick.proxy.IProxy;
 import sidben.pogostick.reference.Reference;
+import sidben.pogostick.tracker.BounceManager;
 import sidben.pogostick.handler.ConfigurationHandler;
 
 @Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion)
@@ -25,6 +26,10 @@ public class ModPogoStick
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
     public static IProxy                 proxy;
 
+    
+    public static BounceManager bounceManager;
+    
+    
     
 
     @Mod.EventHandler
@@ -44,6 +49,9 @@ public class ModPogoStick
     {
         // Sided initializations
         proxy.initialize();
+        
+        // Helper classes single instances
+        bounceManager = new BounceManager();
     }
 
 
