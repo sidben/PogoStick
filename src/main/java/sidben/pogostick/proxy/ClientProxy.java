@@ -1,6 +1,6 @@
 package sidben.pogostick.proxy;
 
-import sidben.pogostick.helper.ItemsHelper;
+import sidben.pogostick.main.Features;
 
 public class ClientProxy extends CommonProxy
 {
@@ -11,7 +11,7 @@ public class ClientProxy extends CommonProxy
         super.initialize();
         
         // Register items
-        ItemsHelper.registerRender();
+        Features.registerItemModels();
     }
     
 }

@@ -1,4 +1,4 @@
-package sidben.pogostick.tracker;
+package sidben.pogostick.util.tracker;
 
 import net.minecraft.item.ItemStack;
 

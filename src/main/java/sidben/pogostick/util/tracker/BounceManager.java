@@ -1,11 +1,11 @@
-package sidben.pogostick.tracker;
+package sidben.pogostick.util.tracker;
 
 import java.util.HashMap;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import sidben.pogostick.helper.LogHelper;
+import sidben.pogostick.util.LogHelper;
 
 
 /**

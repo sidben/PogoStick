@@ -1,4 +1,4 @@
-package sidben.pogostick.helper;
+package sidben.pogostick.util;
 
 
 import org.apache.logging.log4j.Level;
