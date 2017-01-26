@@ -10,8 +10,6 @@ public class ClientProxy extends CommonProxy
     public void initialize()
     {
         super.initialize();
-
-        // Register items
         Features.registerItemModels();
     }
 

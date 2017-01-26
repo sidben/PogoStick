@@ -19,27 +19,22 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void pre_initialize()
     {
-        // Items
         Features.registerItems();
+        Features.registerCapabilities();
 
-        // Network messages
         ModPogoStick.instance.getNetworkManager().registerMessages();
-
-        // Capabilities
-        CapabilityPogostick.register();
     }
 
 
     @Override
     public void initialize()
     {
-        // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new EventHandlerCapability());
         MinecraftForge.EVENT_BUS.register(new EventHandlerEntity());
         
-        // Recipes
         Features.registerRecipes();
+        Features.registerStats();
     }
 
 

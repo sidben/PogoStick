@@ -1,4 +1,5 @@
 # Items
 pogostick:item.pogo_stick.name=Pogo Stick
 
-# Config GUI
+# Stats
+pogostick:stat.times_bounced=Times bounced
