@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import sidben.pogostick.util.LogHelper;
 
+
 public class NetworkManager
 {
 
@@ -29,7 +30,7 @@ public class NetworkManager
     public void sendPogoStatusUpdate(boolean isUsingPogostick, @Nonnull EntityPlayer player)
     {
         final MessagePogostickStatusUpdate message = new MessagePogostickStatusUpdate(isUsingPogostick);
-        LogHelper.info("Sending MessagePogostickStatusUpdate() - " + message + " to " + player);
+        LogHelper.trace("Sending MessagePogostickStatusUpdate() - Message: %s to %s", message, player);
 
         this._networkWrapper.sendTo(message, (EntityPlayerMP) player);
     }

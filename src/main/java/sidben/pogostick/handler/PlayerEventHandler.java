@@ -142,11 +142,11 @@ public class PlayerEventHandler
         
         
         if (entity.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
-            LogHelper.info("+   PlayerFalling (with pogostick capability)");
-            LogHelper.info("+     " + entity);
+            LogHelper.debug("+   PlayerFalling (with pogostick capability)");
+            LogHelper.debug("+     " + entity);
             
             IPogostick pogostickStatus = entity.getCapability(CapabilityPogostick.POGOSTICK, null);
-            LogHelper.info("+     isActive: " + pogostickStatus.isUsingPogostick());
+            LogHelper.debug("+     isActive: " + pogostickStatus.isUsingPogostick());
         }
         
 

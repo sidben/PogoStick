@@ -1,7 +1,5 @@
 package sidben.pogostick.capability;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.INBTSerializable;
 import sidben.pogostick.util.LogHelper;
 
 
@@ -9,7 +7,7 @@ public class CapabilityHandlerPogostick implements IPogostick
 {
 
     private boolean _isActive;
-    
+
 
     @Override
     public boolean isUsingPogostick()
@@ -20,15 +18,15 @@ public class CapabilityHandlerPogostick implements IPogostick
     @Override
     public void updatePogostickUsage(boolean isActive)
     {
-        LogHelper.info(" ** Updating isActive " + isActive + " on " + super.toString());
+        LogHelper.debug(" ** Updating isActive %s on %s", isActive, super.toString());
         this._isActive = isActive;
     }
 
-    
+
     @Override
     public String toString()
     {
         return "CapabilityHandlerPogostick [isActive=" + _isActive + "]";
     }
-    
+
 }
