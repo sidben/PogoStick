@@ -74,9 +74,9 @@ public class EventHandlerEntity
 
             // Check if the player is holding the pogostick right now
             ItemStack pogoStack = ItemStack.EMPTY;
-            if (entity.getHeldItemMainhand().getItem() == Features.pogoStick) {
+            if (entity.getHeldItemMainhand().getItem() == Features.Items.POGOSTICK) {
                 pogoStack = entity.getHeldItemMainhand();
-            } else if (entity.getHeldItemOffhand().getItem() == Features.pogoStick) {
+            } else if (entity.getHeldItemOffhand().getItem() == Features.Items.POGOSTICK) {
                 pogoStack = entity.getHeldItemOffhand();
             }
 
