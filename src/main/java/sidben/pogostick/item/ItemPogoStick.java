@@ -2,6 +2,7 @@ package sidben.pogostick.item;
 
 import javax.annotation.Nullable;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -42,8 +43,8 @@ public class ItemPogoStick extends Item
                 // TODO: use the isEntityUsingPogoStick(), that should be moved elsewhere
                 // return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 
-                if (entityIn.hasCapability(CapabilityPogostick.POGOSTICK, entityIn.getAdjustedHorizontalFacing())) {
-                    final IPogostick pogostickStatus = entityIn.getCapability(CapabilityPogostick.POGOSTICK, entityIn.getAdjustedHorizontalFacing());
+                if (entityIn instanceof EntityLiving && entityIn.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
+                    final IPogostick pogostickStatus = entityIn.getCapability(CapabilityPogostick.POGOSTICK, null);
                     return pogostickStatus.isUsingPogostick() ? 1F : 0F;
                 }
 
