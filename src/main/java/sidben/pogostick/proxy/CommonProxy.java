@@ -5,7 +5,7 @@ import sidben.pogostick.ModPogoStick;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.handler.EventHandlerCapability;
 import sidben.pogostick.handler.EventHandlerEntity;
-import sidben.pogostick.handler.PlayerEventHandler;
+import sidben.pogostick.handler.EventHandlerPlayer;
 import sidben.pogostick.main.Features;
 
 
@@ -29,7 +29,8 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void initialize()
     {
-        MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
+        // Event Handlers
+        MinecraftForge.EVENT_BUS.register(new EventHandlerPlayer());
         MinecraftForge.EVENT_BUS.register(new EventHandlerCapability());
         MinecraftForge.EVENT_BUS.register(new EventHandlerEntity());
         

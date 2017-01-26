@@ -12,10 +12,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerFlyableFallEvent;
@@ -27,11 +29,12 @@ import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
 import sidben.pogostick.main.Features;
 import sidben.pogostick.util.LogHelper;
+import sidben.pogostick.util.PogostickHelper;
 import sidben.pogostick.util.tracker.EntityLandingTracker;
 
 
 
-public class PlayerEventHandler
+public class EventHandlerPlayer
 {
     
 
@@ -65,18 +68,59 @@ public class PlayerEventHandler
                 LogHelper.debug("    with pogostick capability - %s", pogostickStatus);
                 
                 
+                // TODO: move to pogohelper
                 if (!entity.world.isRemote) {
                     ((EntityPlayer) entity).addStat(Features.statTimesBounced);
                     LogHelper.debug("    adding stat");
                 }
                 
             }
-
+        
         }
+        
+        
+        if (entity instanceof EntityLivingBase && entity.hasCapability(CapabilityPogostick.POGOSTICK, null)) 
+        {
+            IPogostick pogostickStatus = entity.getCapability(CapabilityPogostick.POGOSTICK, null);
+
+            LogHelper.debug("onLivingFallEvent() - %s - %s", pogostickStatus, entity);
+            LogHelper.debug("    Distance: %.6f  - Damage mult: %.4f", event.getDistance(), event.getDamageMultiplier());
+            
+            
+            
+            if (pogostickStatus.isUsingPogostick() && event.getDistance() > PogostickHelper.MIN_DISTANCE_TO_BOUNCE) {
+
+                // Negates fall damage
+                event.setDamageMultiplier(0.0F);
+                
+                // Bounces
+                LogHelper.debug("  Original motionY " + entity.motionY);
+                MinecraftForge.EVENT_BUS.register(new DelayedEventHandlerBounceEntity(1, entity, event.getDistance()));
+
+                
+                
+                /*
+                if (!entity.world.isRemote) {
+                    ItemStack pogoStack = PogostickHelper.getHeldPogostick(entity);
+                    pogoStack.damageItem(1, entity);       // TODO: dmg item based on distance fallen (max 3 dmg?)
+                } else {
+                    if (entity instanceof EntityPlayer) {
+                        entity.playSound(SoundEvents.ENTITY_SLIME_JUMP, 0.8F, 0.8F + entity.world.rand.nextFloat() * 0.4F);                
+                    }
+                }
+                */
+                
+                // ModPogoStick.bounceManager.pushEntity(entity, entity.motionY, entity.getActiveItemStack());
+                
+            }
+            
+        }
+        
 
         
     }
     
+
 
     @SubscribeEvent
     public void onLivingUpdateEvent(LivingUpdateEvent event)
@@ -92,5 +136,20 @@ public class PlayerEventHandler
     }    
     
     
+    
+    private void bouncesEntity(EntityLivingBase entity, EntityLandingTracker tracker) {
+        if (tracker != EntityLandingTracker.EMPTY && tracker.getBounceMotionY() > 0.0D) {
+            //entity.fallDistance = 0.0F;
+            entity.motionY = tracker.getBounceMotionY();
+            entity.isAirBorne = true;
+            entity.onGround = false;
+
+            if (!entity.world.isRemote) {
+                tracker.getItemStack().damageItem(1, entity);       // TODO: dmg item based on distance fallen (max 3 dmg?)
+            } else {
+                entity.playSound(SoundEvents.ENTITY_SLIME_JUMP, 0.8F, 0.8F + entity.world.rand.nextFloat() * 0.4F);                
+            }
+        }
+    }
     
 }
