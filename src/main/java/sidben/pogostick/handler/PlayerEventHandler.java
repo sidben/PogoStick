@@ -1,12 +1,14 @@
 package sidben.pogostick.handler;
 
 import java.util.UUID;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -21,14 +23,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import sidben.pogostick.ModPogoStick;
-import sidben.pogostick.helper.ItemsHelper;
-import sidben.pogostick.helper.LogHelper;
-import sidben.pogostick.tracker.EntityLandingTracker;
+import sidben.pogostick.capability.CapabilityPogostick;
+import sidben.pogostick.capability.IPogostick;
+import sidben.pogostick.main.Features;
+import sidben.pogostick.util.LogHelper;
+import sidben.pogostick.util.tracker.EntityLandingTracker;
 
 
 
 public class PlayerEventHandler
 {
+    
+    
+    
 
 
     @SubscribeEvent
@@ -37,11 +44,13 @@ public class PlayerEventHandler
         EntityLivingBase entity = event.getEntityLiving();
         
         if (entity instanceof EntityPlayer) {
+            /*
             LogHelper.info("onPlayerFallEvent()");
             LogHelper.info("    distance:      " + event.getDistance());
             LogHelper.info("    dmg mult:      " + event.getMultiplier());
             LogHelper.info("    player:        " + event.getEntityPlayer());
             LogHelper.info("    motion Y:      " + event.getEntityLiving().motionY);
+            */
             /*
             LogHelper.info("    main hand:     " + event.getEntityPlayer().getHeldItemMainhand());
             LogHelper.info("    off hand:      " + event.getEntityPlayer().getHeldItemOffhand());
@@ -51,6 +60,7 @@ public class PlayerEventHandler
         }
         
 
+        /*
         // Fall on creative mode
         if (isEntityUsingPogoStick(entity) && entity instanceof EntityPlayer) {
             LogHelper.info("** Player that can fly was falling, but landed using a pogo stick. **");
@@ -61,6 +71,7 @@ public class PlayerEventHandler
             // Bounces
             ModPogoStick.bounceManager.pushEntity(entity, entity.motionY, entity.getActiveItemStack());
         }
+        */
     }
 
 
@@ -71,6 +82,7 @@ public class PlayerEventHandler
         EntityLivingBase entity = event.getEntityLiving();
 
         if (entity instanceof EntityPlayer) {
+            /*
             LogHelper.info("onLivingFallEvent()");
             LogHelper.info("    is remote:     " + entity.world.isRemote);
             LogHelper.info("    using pogo:    " + isEntityUsingPogoStick(entity));
@@ -78,6 +90,8 @@ public class PlayerEventHandler
             LogHelper.info("    dmg mult:      " + event.getDamageMultiplier());
             LogHelper.info("    entity:        " + event.getEntityLiving());
             LogHelper.info("    motion Y:      " + event.getEntityLiving().motionY);
+            */
+            
             /*
             LogHelper.info("    main hand:     " + event.getEntityLiving().getHeldItemMainhand());
             LogHelper.info("    off hand:      " + event.getEntityLiving().getHeldItemOffhand());
@@ -90,6 +104,7 @@ public class PlayerEventHandler
 
         
         
+        /*
         if (isEntityUsingPogoStick(entity) && entity instanceof EntityPlayer) {
             LogHelper.info("** Player was falling, but landed using a pogo stick. **");
             
@@ -99,7 +114,44 @@ public class PlayerEventHandler
             // Bounces
             ModPogoStick.bounceManager.pushEntity(entity, entity.motionY, entity.getActiveItemStack());
         }
+        */
 
+
+        /*
+        LogHelper.info("onLivingFallEvent()");
+        LogHelper.info("    main hand:     " + event.getEntityLiving().getHeldItemMainhand());
+        LogHelper.info("    off hand:      " + event.getEntityLiving().getHeldItemOffhand());
+        LogHelper.info("    active item:   " + event.getEntityLiving().getActiveItemStack());           // <---
+        */
+
+
+        /*
+        if (ModPogoStick.isBouncingTempVar < 0) {
+            
+            // Negates fall damage
+            event.setDamageMultiplier(0.0F);
+
+            if (!entity.world.isRemote) {
+                LogHelper.info("  damaging item");
+                entity.getHeldItemMainhand().damageItem(1, entity);
+            }
+        
+        }
+        */
+        
+        
+        
+        if (entity.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
+            LogHelper.info("+   PlayerFalling (with pogostick capability)");
+            LogHelper.info("+     " + entity);
+            
+            IPogostick pogostickStatus = entity.getCapability(CapabilityPogostick.POGOSTICK, null);
+            LogHelper.info("+     isActive: " + pogostickStatus.isUsingPogostick());
+        }
+        
+
+
+        
     }
     
 
@@ -108,6 +160,11 @@ public class PlayerEventHandler
     {
         EntityLivingBase entity = event.getEntityLiving();
 
+        if (entity instanceof EntityPlayerMP) 
+        {
+            // LogHelper.info(String.format("onLivingUpdateEvent() - Tick %f - %s", Minecraft.getMinecraft().getRenderPartialTicks(), entity));
+        }
+        
         
         if (isEntityUsingPogoStick(entity) && entity instanceof EntityPlayerSP) {
             //LogHelper.info(String.format("onLivingUpdateEvent()  - forward %.4f (%.2f) / strafe %.4f / motionX %.4f / motionZ %.4f", entity.moveForward, ((EntityPlayerSP)entity).movementInput.moveForward, entity.moveStrafing, entity.motionX, entity.motionZ));
@@ -125,9 +182,13 @@ public class PlayerEventHandler
         EntityLandingTracker tracker = EntityLandingTracker.EMPTY;
 
         // if (!entity.world.isRemote) return;
+        
+        
+        // LogHelper.info(String.format("  temp var %d, phase %s", ModPogoStick.isBouncingTempVar, event.phase));
+        
 
         
-        
+        /*
         if (event.phase == Phase.START && entity != null) {
             //LogHelper.info(String.format("onPlayerTickEvent() S  - forward %.4f / strafe %.4f / motionX %.4f / motionZ %.4f", entity.moveForward, entity.moveStrafing, entity.motionX, entity.motionZ));
             
@@ -224,6 +285,7 @@ public class PlayerEventHandler
             tracker = ModPogoStick.bounceManager.popEntity(entity);
             bouncesEntity(entity, tracker);
         }
+        */
     }    
     
     
@@ -231,7 +293,7 @@ public class PlayerEventHandler
     
     
     private boolean isEntityUsingPogoStick(EntityLivingBase entity) {
-        return entity != null && entity.isHandActive() && entity.getActiveItemStack().getItem() == ItemsHelper.pogoStick;
+        return entity != null && entity.isHandActive() && entity.getActiveItemStack().getItem() == Features.pogoStick;
     }
     
     private void bouncesEntity(EntityLivingBase entity, EntityLandingTracker tracker) {
