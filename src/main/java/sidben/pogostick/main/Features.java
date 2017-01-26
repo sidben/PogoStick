@@ -10,45 +10,43 @@ import sidben.pogostick.item.ItemPogoStick;
 
 
 /**
- * Handles blocks, items, commands and other features from this mod. 
+ * Handles blocks, items, commands and other features from this mod.
  */
 public class Features
 {
 
-    
-    //-----------------------------------------------------------------------
-    // Items
-    //-----------------------------------------------------------------------
 
-    public static final ItemPogoStick  pogoStick = new ItemPogoStick();
-    
-    
-    
+    // -----------------------------------------------------------------------
+    // Items
+    // -----------------------------------------------------------------------
+
+    public static final ItemPogoStick pogoStick = new ItemPogoStick();
+
+
+
     public static void registerItems()
     {
         GameRegistry.register(pogoStick);
     }
-    
+
     @SideOnly(Side.CLIENT)
     public static void registerItemModels()
     {
-        ItemModelMesher itemMesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-        
+        final ItemModelMesher itemMesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+
         itemMesher.register(pogoStick, 0, new ModelResourceLocation("pogostick:pogo_stick", "inventory"));
     }
 
-    
-    
-    
-    
-    //-----------------------------------------------------------------------
-    // Blocks
-    //-----------------------------------------------------------------------
 
-    
-    
-    //-----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // Blocks
+    // -----------------------------------------------------------------------
+
+
+
+    // -----------------------------------------------------------------------
     // Commands
-    //-----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
 
 }

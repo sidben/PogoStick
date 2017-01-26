@@ -1,41 +1,39 @@
 package sidben.pogostick;
 
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import sidben.pogostick.handler.ConfigurationHandler;
+import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.proxy.IProxy;
 import sidben.pogostick.reference.Reference;
 import sidben.pogostick.util.tracker.BounceManager;
-import sidben.pogostick.network.NetworkManager;
-import sidben.pogostick.handler.ConfigurationHandler;
+
 
 @Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion)
 public class ModPogoStick
 {
-    
-    
+
+
     // The instance of your mod that Forge uses.
     @Mod.Instance(Reference.ModID)
-    public static ModPogoStick   instance;
+    public static ModPogoStick  instance;
 
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
-    public static IProxy                 proxy;
-    
+    public static IProxy        proxy;
+
     public static BounceManager bounceManager;
-    
-    
+
+
     // public static int isBouncingTempVar;
 
-    private NetworkManager             _networkManager;
+    private NetworkManager      _networkManager;
 
 
 
-    
     public NetworkManager getNetworkManager()
     {
         if (_networkManager == null) {
@@ -43,10 +41,8 @@ public class ModPogoStick
         }
         return _networkManager;
     }
-    
-    
-    
-    
+
+
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -65,7 +61,7 @@ public class ModPogoStick
     {
         // Sided initializations
         proxy.initialize();
-        
+
         // Helper classes single instances
         bounceManager = new BounceManager();
     }

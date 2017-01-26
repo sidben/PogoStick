@@ -21,7 +21,7 @@ public abstract class CommonProxy implements IProxy
     {
         // Register items
         Features.registerItems();
-        
+
         // Network messages
         ModPogoStick.instance.getNetworkManager().registerMessages();
 

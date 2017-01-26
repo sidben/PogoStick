@@ -9,14 +9,14 @@ import sidben.pogostick.reference.Reference;
 
 public class ConfigurationHandler
 {
-    public static final String   CATEGORY_DEBUG = "debug";
+    public static final String  CATEGORY_DEBUG = "debug";
 
-    public static boolean        onDebug;
+    public static boolean       onDebug;
 
 
 
     // Instance
-    public static Configuration  config;
+    public static Configuration config;
 
 
 
