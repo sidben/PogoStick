@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import sidben.pogostick.ModPogoStick;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
@@ -74,27 +75,13 @@ public class ItemPogoStick extends Item
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
+        ItemStack material = new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE);
+        if (OreDictionary.itemMatches(material, repair, false)) return true;
         return repair.getItem() == Items.SLIME_BALL;
     }
 
 
-    /**
-     * returns the action that specifies what animation to play when the items is being used
-     */
-    @Override
-    public EnumAction getItemUseAction(ItemStack stack)
-    {
-        return EnumAction.NONE;     // TODO: remove
-    }
-
-    /**
-     * How long it takes to use or consume an item
-     */
-    @Override
-    public int getMaxItemUseDuration(ItemStack stack)
-    {
-        return 72000;       // Same as shield, but may be limited - TODO: after capabilities, remove
-    }
+    
 
 
     @Override
@@ -105,6 +92,7 @@ public class ItemPogoStick extends Item
 
         // TODO: validation - add to the interface canEnablePogostick? - not flying, not swiming, etc
         // TODO: a way to pass the player to the capability, so I can apply the business rule and deactivate when the player enters water, etc
+        // TODO: add some tiny delay before activating the pogostick. Food items have getMaxItemUseDuration() of 32
         // TODO: BUG - food items on the off-hand are consumed without the animation
 
 

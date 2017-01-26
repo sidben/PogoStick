@@ -19,7 +19,7 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void pre_initialize()
     {
-        // Register items
+        // Items
         Features.registerItems();
 
         // Network messages
@@ -37,6 +37,9 @@ public abstract class CommonProxy implements IProxy
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new EventHandlerCapability());
         MinecraftForge.EVENT_BUS.register(new EventHandlerEntity());
+        
+        // Recipes
+        Features.registerRecipes();
     }
 
 

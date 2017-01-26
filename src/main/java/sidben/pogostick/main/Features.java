@@ -3,9 +3,12 @@ package sidben.pogostick.main;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import sidben.pogostick.item.ItemPogoStick;
 
 
@@ -42,6 +45,23 @@ public class Features
     // -----------------------------------------------------------------------
     // Blocks
     // -----------------------------------------------------------------------
+
+
+
+    // -----------------------------------------------------------------------
+    // Recipes
+    // -----------------------------------------------------------------------
+
+    private static String OREDIC_STICK      = "stickWood";
+    private static String OREDIC_IRON_BLOCK = "blockIron";
+
+
+    public static void registerRecipes()
+    {
+        final ItemStack slimeBlocks = new ItemStack(Blocks.SLIME_BLOCK);
+
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Features.pogoStick, 1), "ttt", " i ", " s ", 't', OREDIC_STICK, 'i', OREDIC_IRON_BLOCK, 's', slimeBlocks));
+    }
 
 
 
