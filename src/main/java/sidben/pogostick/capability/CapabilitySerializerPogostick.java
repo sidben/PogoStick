@@ -14,13 +14,11 @@ public class CapabilitySerializerPogostick implements ICapabilitySerializable<NB
 
     private static String          NBT_ACTIVE = "pogostickActive";
 
-    private final EntityLivingBase _entity;
     private final IPogostick       _capabilityInstance;
 
 
 
-    public CapabilitySerializerPogostick(@Nonnull EntityLivingBase entity) {
-        this._entity = entity;
+    public CapabilitySerializerPogostick() {
         this._capabilityInstance = new CapabilityHandlerPogostick();
     }
 
@@ -29,8 +27,6 @@ public class CapabilitySerializerPogostick implements ICapabilitySerializable<NB
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
-        LogHelper.debug(" ** hasCapability [v2] - %s", this._entity);
-
         return capability == CapabilityPogostick.POGOSTICK;
     }
 
@@ -46,8 +42,6 @@ public class CapabilitySerializerPogostick implements ICapabilitySerializable<NB
     @Override
     public NBTTagCompound serializeNBT()
     {
-        LogHelper.debug(" ** serializeNBT [v2] - %s", this._entity);
-
         final NBTTagCompound nbtCompound = new NBTTagCompound();
         nbtCompound.setBoolean(NBT_ACTIVE, this._capabilityInstance.isUsingPogostick());
         return nbtCompound;
@@ -57,8 +51,6 @@ public class CapabilitySerializerPogostick implements ICapabilitySerializable<NB
     @Override
     public void deserializeNBT(NBTTagCompound nbt)
     {
-        LogHelper.info(" ** deserializeNBT [v2] - %s", this._entity);
-
         final NBTTagCompound nbtCompound = nbt;
         this._capabilityInstance.updatePogostickUsage(nbtCompound.getBoolean(NBT_ACTIVE));
     }

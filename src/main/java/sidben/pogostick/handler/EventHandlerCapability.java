@@ -19,12 +19,9 @@ public class EventHandlerCapability
 
         // TODO: Allow zombies / baby zombies to use pogosticks
         if (event.getEntity() instanceof EntityPlayer) {
-            LogHelper.trace("Adding capabilities to player");
-
-            event.addCapability(new ResourceLocation(Reference.ModID, "pogo"), new CapabilitySerializerPogostick((EntityLivingBase) event.getEntity()));
+            event.addCapability(new ResourceLocation(Reference.ModID, "pogo"), new CapabilitySerializerPogostick());
         }
 
     }
-
 
 }
