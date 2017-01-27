@@ -2,11 +2,9 @@ package sidben.pogostick.item;
 
 import javax.annotation.Nullable;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,6 +20,7 @@ import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
 import sidben.pogostick.reference.Reference;
 import sidben.pogostick.util.LogHelper;
+import sidben.pogostick.util.PogostickHelper;
 
 
 public class ItemPogoStick extends Item
@@ -40,10 +39,8 @@ public class ItemPogoStick extends Item
             @SideOnly(Side.CLIENT)
             public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
             {
-                // TODO: use the isEntityUsingPogoStick(), that should be moved elsewhere
-                // return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 
-                if (entityIn instanceof EntityLiving && entityIn.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
+                if (entityIn != null && entityIn.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
                     final IPogostick pogostickStatus = entityIn.getCapability(CapabilityPogostick.POGOSTICK, null);
                     return pogostickStatus.isUsingPogostick() ? 1F : 0F;
                 }
@@ -76,13 +73,11 @@ public class ItemPogoStick extends Item
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
-        ItemStack material = new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE);
-        if (OreDictionary.itemMatches(material, repair, false)) return true;
+        final ItemStack material = new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE);
+        if (OreDictionary.itemMatches(material, repair, false)) { return true; }
         return repair.getItem() == Items.SLIME_BALL;
     }
 
-
-    
 
 
     @Override
@@ -91,8 +86,6 @@ public class ItemPogoStick extends Item
         LogHelper.trace("onItemRightClick(world, %s, %s)", playerIn, handIn);
 
 
-        // TODO: validation - add to the interface canEnablePogostick? - not flying, not swiming, etc
-        // TODO: a way to pass the player to the capability, so I can apply the business rule and deactivate when the player enters water, etc
         // TODO: add some tiny delay before activating the pogostick. Food items have getMaxItemUseDuration() of 32
         // TODO: BUG - food items on the off-hand are consumed without the animation
 
@@ -101,13 +94,17 @@ public class ItemPogoStick extends Item
         // TODO: test if I can trust that the client won't desync if I update the capability here
         // I think that the Elytra updates client-side and send to server
 
+
         if (!worldIn.isRemote && playerIn.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
             final IPogostick pogostickStatus = playerIn.getCapability(CapabilityPogostick.POGOSTICK, null);
             boolean shouldEnablePogostick = false;
 
             if (!pogostickStatus.isUsingPogostick()) {
-                // TODO: util method: canEnablePogostick
-                shouldEnablePogostick = (playerIn.onGround || (!playerIn.isInWater() && !playerIn.isInLava() && !playerIn.isElytraFlying())) && !playerIn.isPlayerSleeping();
+                shouldEnablePogostick = PogostickHelper.canEntityActivatePogostick(playerIn);
+                if (!shouldEnablePogostick) {
+                    LogHelper.debug("    pogostick denied");
+                    // playerIn.playSound(SoundEvents.BLOCK_SLIME_HIT, 1.8F, 1.8F); // don't work, must be on client
+                }
             }
 
             LogHelper.debug("> capability - isUsing (pre, fresh) == %s", playerIn.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick());
