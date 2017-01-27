@@ -113,18 +113,29 @@ public class PogostickHelper
 
         float adjustedFallDistance = fallDistance;
         float minMotion = 0.6F;
+        float lastModifier = 0.4F;
 
-        // If the player is sneaking the bounce limit is much lower
-        if (entity instanceof EntityPlayer && entity.isSneaking()) {
-            adjustedFallDistance = fallDistance * 0.25F;
-            minMotion = 0.75F;
+        if (entity instanceof EntityPlayer) {
+            if (entity.isSneaking()) {
+                // If the player is sneaking the bounce limit is much lower
+                LogHelper.debug("  Applying sneaking modifier");
+                adjustedFallDistance = fallDistance * 0.25F;
+                minMotion = 0.75F;
+
+            } else if (entity.isSprinting()) {
+                // If the player is sprinting the bounce height limit is lower, but accelerates faster 
+                // (horizontal speed should be increased)
+                LogHelper.debug("  Applying sprinting modifier");
+                lastModifier = 0.25F;
+                
+            }
         }
 
 
         LogHelper.debug(">>> Fall distance %.4f (from %.4f)", adjustedFallDistance, fallDistance);
         LogHelper.debug(">>> Old motionY %.4f", entity.motionY);
 
-        final double newSpeed = minMotion + Math.log(Math.max(adjustedFallDistance, 1)) * 0.4F;
+        final double newSpeed = minMotion + Math.log(Math.max(adjustedFallDistance, 1)) * lastModifier;
         entity.motionY = Math.min(newSpeed, MAX_MOTION_UP);
 
         LogHelper.debug(">>> New motionY %.4f (max %.4f)", newSpeed, MAX_MOTION_UP);
@@ -144,6 +155,7 @@ public class PogostickHelper
     {
         if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() || entity.onGround) { return; }
 
+        // TODO: better formula, I want much slower acceleration
 
         final float s1 = entity.moveStrafing * entity.moveStrafing + entity.moveForward * entity.moveForward;
         final float s2 = Math.max(MathHelper.sqrt(s1), 1F);
