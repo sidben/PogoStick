@@ -21,10 +21,12 @@ import sidben.pogostick.reference.Reference;
  * x Allow the pogostick to get Frost Walker via books (anvil)
  * x Allow the pogostick to get Curse of Vanishing via books (anvil) - vanilla behavior
  * 
- * - Custom implementation of Frost Walker - freeze water where the pogostick lands
+ * x Custom implementation of Frost Walker - freeze water where the pogostick lands
  * 
  * - Check if potion of speed works as expected
  * - Check if potion of leaping works as expected
+ * 
+ * - New enchantment: Spring (max II or III) - raises max bounce height
  */
 
 
