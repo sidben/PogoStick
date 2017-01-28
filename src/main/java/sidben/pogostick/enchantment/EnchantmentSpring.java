@@ -4,9 +4,8 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import sidben.pogostick.item.ItemPogoStick;
 import sidben.pogostick.reference.Reference;
-import sidben.pogostick.util.LogHelper;
+import sidben.pogostick.util.PogostickHelper;
 
 
 public class EnchantmentSpring extends Enchantment
@@ -51,12 +50,12 @@ public class EnchantmentSpring extends Enchantment
     @Override
     public boolean canApply(ItemStack stack)
     {
-        return ItemPogoStick.isPogoStack(stack);
+        return PogostickHelper.isPogoStack(stack);
     }
 
     /**
      * Is this enchantment allowed to be enchanted on books via Enchantment Table
-     * 
+     *
      * @return false to disable the vanilla feature
      */
     @Override

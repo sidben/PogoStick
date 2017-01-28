@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
-import sidben.pogostick.main.Features;
 import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.util.LogHelper;
 import sidben.pogostick.util.PogostickHelper;
@@ -73,9 +72,9 @@ public class EventHandlerEntity
 
             // Check if the player is holding the pogostick right now
             ItemStack pogoStack = ItemStack.EMPTY;
-            if (entity.getHeldItemMainhand().getItem() == Features.Items.POGOSTICK) {
+            if (PogostickHelper.isPogoStack(entity.getHeldItemMainhand())) {
                 pogoStack = entity.getHeldItemMainhand();
-            } else if (entity.getHeldItemOffhand().getItem() == Features.Items.POGOSTICK) {
+            } else if (PogostickHelper.isPogoStack(entity.getHeldItemOffhand())) {
                 pogoStack = entity.getHeldItemOffhand();
             }
 
@@ -166,10 +165,11 @@ public class EventHandlerEntity
             } else {
                 // Special rule for Frost Walking. Only test when the player is falling
                 // OBS: motionY on ground will be -0.07840 due to 'gravity', but I can just check for zero since I also check onGround.
-                if (!entity.onGround && entity.motionY < 0F && entity.hasCapability(CapabilityPogostick.POGOSTICK, null) && entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) {
+                if (!entity.onGround && entity.motionY < 0F && entity.hasCapability(CapabilityPogostick.POGOSTICK, null)
+                        && entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) {
                     PogostickHelper.tryfrostBounce(entity);
                 }
-                
+
             }
 
         }

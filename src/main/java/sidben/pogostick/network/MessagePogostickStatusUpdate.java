@@ -1,5 +1,6 @@
 package sidben.pogostick.network;
 
+import javax.annotation.concurrent.Immutable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,6 +12,7 @@ import sidben.pogostick.capability.IPogostick;
 import sidben.pogostick.util.LogHelper;
 
 
+@Immutable
 public class MessagePogostickStatusUpdate implements IMessage
 {
 

@@ -17,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import sidben.pogostick.capability.CapabilityPogostick;
-import sidben.pogostick.item.ItemPogoStick;
 import sidben.pogostick.main.Features;
 
 
@@ -40,7 +39,7 @@ public class PogostickHelper
      */
     public static boolean canEntityActivatePogostick(@Nonnull EntityLivingBase entity)
     {
-        final boolean isHoldingPogostick = (entity.getHeldItemMainhand().getItem() == Features.Items.POGOSTICK || entity.getHeldItemOffhand().getItem() == Features.Items.POGOSTICK);
+        final boolean isHoldingPogostick = isPogoStack(entity.getHeldItemMainhand()) || isPogoStack(entity.getHeldItemOffhand());
 
         // TODO: negate activation if the player has a food item in the other hand (or another item that is used with right-click)
 
@@ -60,15 +59,25 @@ public class PogostickHelper
     public static boolean canEntityKeepUsingPogostick(@Nonnull EntityLivingBase entity)
     {
         return entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
-                && entity.isEntityAlive()
-                && !entity.isRiding()
-                && !entity.isOnLadder()
+                && entity.isEntityAlive() 
+                && !entity.isRiding() 
+                && !entity.isOnLadder() 
                 && !(entity.isInWater() || entity.isInLava())
-                // && !(entity.isInsideOfMaterial(Material.WATER) || entity.isInsideOfMaterial(Material.LAVA))  // TODO: check with other mods liquids  
+                // && !(entity.isInsideOfMaterial(Material.WATER) || entity.isInsideOfMaterial(Material.LAVA)) // TODO: check with other mods liquids
                 && !entity.isElytraFlying();
                 // && !entity.isInWeb; TODO: make isInWeb visible
-        
+
         // OBS: entity.isInsideOfMaterial(Material.WATER) DON'T detect if the player has just the feet in water, inInWater() does.
+    }
+
+
+
+    /**
+     * Is this ItemStack a valid pogostick?
+     */
+    public static boolean isPogoStack(ItemStack stack)
+    {
+        return stack.getItem() == Features.Items.POGOSTICK;
     }
 
 
@@ -120,7 +129,7 @@ public class PogostickHelper
             // Stats
             if (entity instanceof EntityPlayer) {
                 ((EntityPlayer) entity).addStat(Features.Stats.TIMES_BOUNCED);
-            }            
+            }
 
         }
     }
@@ -146,7 +155,7 @@ public class PogostickHelper
                 LogHelper.debug("  Applying sprinting modifier");
                 lastModifier = 0.25F;
 
-            } 
+            }
         }
 
 
@@ -171,77 +180,71 @@ public class PogostickHelper
      */
     public static void removeAirFrictionIfUsingPogostick(@Nonnull EntityLivingBase entity)
     {
-        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
-                || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() 
-                || entity.onGround) { return; }
+        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() || entity.onGround) { return; }
 
         /**
          * Ref:
-         * 
+         *
          * {@link net.minecraft.entity.EntityLivingBase#moveEntityWithHeading(float strafe, float forward)}
          * {@link net.minecraft.entity.Entity#moveRelative(float strafe, float forward, float friction)}
          * {@link net.minecraft.entity.Entity#move(MoverType type, double x, double y, double z)}
          */
-        
+
         // LogHelper.debug("+ Air motion(pre): %.4f, %.4f", entity.motionX, entity.motionZ);
         entity.moveRelative(entity.moveStrafing, entity.moveForward, 0.03F);
         // LogHelper.debug("+ Air motion(pos): %.4f, %.4f", entity.motionX, entity.motionZ);
         // LogHelper.debug("+---------------------------------+");
     }
-    
-    
+
+
 
     /**
      * Try to apply the Frost Walker effect on the block below the given entity.
      * This method DO NOT perform capability validations.
-     * 
-     *  {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby(EntityLivingBase living, World worldIn, BlockPos pos, int level)}
-     * 
-     * @param pos Block position below the player feet.
+     *
+     * {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby(EntityLivingBase living, World worldIn, BlockPos pos, int level)}
+     *
+     * @param pos
+     *            Block position below the player feet.
      */
     public static void tryfrostBounce(EntityLivingBase entity)
     {
-        if (entity.world.isRemote) return;
+        if (entity.world.isRemote) { return; }
 
-        
-        ItemStack playerItemStack = entity.getHeldItemMainhand();
-        
-        if (ItemPogoStick.isPogoStack(playerItemStack)) {
-            int freezeLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FROST_WALKER, playerItemStack);
+
+        final ItemStack playerItemStack = entity.getHeldItemMainhand();
+
+        if (isPogoStack(playerItemStack)) {
+            final int freezeLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FROST_WALKER, playerItemStack);
             LogHelper.trace("$$  Testing for frost walker - level: %d", freezeLevel);
-            
-            
-            if (freezeLevel > 0)
-            {
-                World world = entity.world;
-                BlockPos blockpos = new BlockPos(entity);
-                IBlockState blockstateBelow = world.getBlockState(blockpos.down());
-                
 
-                if (blockstateBelow.getMaterial() == Material.WATER && ((Integer)blockstateBelow.getValue(BlockLiquid.LEVEL)).equals(0))
-                {
+
+            if (freezeLevel > 0) {
+                final World world = entity.world;
+                final BlockPos blockpos = new BlockPos(entity);
+                final IBlockState blockstateBelow = world.getBlockState(blockpos.down());
+
+
+                if (blockstateBelow.getMaterial() == Material.WATER && blockstateBelow.getValue(BlockLiquid.LEVEL).equals(0)) {
                     LogHelper.trace("$$  Freeeeeze!");
                     // TODO: achievement
-    
+
                     /**
-                     * Tweaked implementation of {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby()} 
+                     * Tweaked implementation of {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby()}
                      */
-                    double f = Math.min(16, freezeLevel + 1);
-                    BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(0, 0, 0);
-    
-                    for (BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(blockpos.add((double)(-f), -1.0D, (double)(-f)), blockpos.add((double)f, -1.0D, (double)f)))
-                    {
-                        if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= (double)(f * f))
-                        {
+                    final double f = Math.min(16, freezeLevel + 1);
+                    final BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(0, 0, 0);
+
+                    for (final BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(blockpos.add((-f), -1.0D, (-f)), blockpos.add(f, -1.0D, f))) {
+                        if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= f * f) {
                             blockpos$mutableblockpos.setPos(blockpos$mutableblockpos1.getX(), blockpos$mutableblockpos1.getY() + 1, blockpos$mutableblockpos1.getZ());
-                            IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
-    
-                            if (iblockstate.getMaterial() == Material.AIR)
-                            {
-                                IBlockState iblockstate1 = world.getBlockState(blockpos$mutableblockpos1);
-    
-                                if (iblockstate1.getMaterial() == Material.WATER && ((Integer)iblockstate1.getValue(BlockLiquid.LEVEL)).intValue() == 0 && world.mayPlace(Blocks.FROSTED_ICE, blockpos$mutableblockpos1, false, EnumFacing.DOWN, (Entity)null))
-                                {
+                            final IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
+
+                            if (iblockstate.getMaterial() == Material.AIR) {
+                                final IBlockState iblockstate1 = world.getBlockState(blockpos$mutableblockpos1);
+
+                                if (iblockstate1.getMaterial() == Material.WATER && iblockstate1.getValue(BlockLiquid.LEVEL).intValue() == 0
+                                        && world.mayPlace(Blocks.FROSTED_ICE, blockpos$mutableblockpos1, false, EnumFacing.DOWN, (Entity) null)) {
                                     world.setBlockState(blockpos$mutableblockpos1, Blocks.FROSTED_ICE.getDefaultState());
                                     world.scheduleUpdate(blockpos$mutableblockpos1.toImmutable(), Blocks.FROSTED_ICE, MathHelper.getInt(entity.getRNG(), 60, 120));
                                 }
@@ -250,13 +253,13 @@ public class PogostickHelper
                     }
 
                 }
-                
+
 
             }
 
         }
 
     }
-     
+
 
 }
