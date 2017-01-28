@@ -2,8 +2,10 @@ package sidben.pogostick.item;
 
 import javax.annotation.Nullable;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
@@ -17,6 +19,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
+import sidben.pogostick.main.Features;
 import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.reference.Reference;
 import sidben.pogostick.util.LogHelper;
@@ -79,6 +82,24 @@ public class ItemPogoStick extends Item
     }
 
 
+    /**
+     * Return the enchantability factor of the item, most of the time is based on material.
+     */
+    @Override
+    public int getItemEnchantability()
+    {
+        return 17;
+    }
+
+
+    // NOTE: despite what Forge says, this method is ALSO used when applying enchantments at the anvil.
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment)
+    {
+        // Unbreaking should be the only candidate at the enchanting table
+        return enchantment.type.canEnchantItem(stack.getItem()) || enchantment == Enchantments.FROST_WALKER;
+    }
+
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
@@ -132,6 +153,18 @@ public class ItemPogoStick extends Item
     {
         // Avoids re-equipping the item when it takes damage
         return !oldStack.getItem().equals(newStack.getItem());      // TODO: check if a slot change would cause problems. I want to ignore animation just for the same slot
+    }
+
+
+
+    // TODO: move to the helper class
+
+    /**
+     * Is this ItemStack a valid pogostick?
+     */
+    public static boolean isPogoStack(ItemStack stack)
+    {
+        return stack.getItem() == Features.pogoStick;
     }
 
 
