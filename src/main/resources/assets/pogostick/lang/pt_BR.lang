@@ -3,3 +3,6 @@ pogostick:item.pogo_stick.name=Pula-pula
 
 # Stats
 pogostick:stat.times_bounced=Quantidade de quicadas
+
+# Enchantments
+pogostick:enchantment.spring=Mola

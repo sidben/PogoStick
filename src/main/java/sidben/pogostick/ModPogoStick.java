@@ -26,7 +26,8 @@ import sidben.pogostick.reference.Reference;
  * - Check if potion of speed works as expected
  * - Check if potion of leaping works as expected
  * 
- * - New enchantment: Spring (max II or III) - raises max bounce height
+ * x New enchantment: Spring I/II
+ * - Custom implementation of Spring - raises max bounce height (regular height will be lowered)
  */
 
 

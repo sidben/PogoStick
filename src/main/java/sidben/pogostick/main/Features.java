@@ -3,7 +3,9 @@ package sidben.pogostick.main;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatBasic;
@@ -13,6 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import sidben.pogostick.capability.CapabilityPogostick;
+import sidben.pogostick.enchantment.EnchantmentSpring;
 import sidben.pogostick.item.ItemPogoStick;
 
 
@@ -27,13 +30,15 @@ public class Features
     // Items
     // -----------------------------------------------------------------------
 
-    public static final ItemPogoStick pogoStick = new ItemPogoStick();
-
+    public static class Items
+    {
+        public static final ItemPogoStick POGOSTICK = new ItemPogoStick();
+    }
 
 
     public static void registerItems()
     {
-        GameRegistry.register(pogoStick);
+        GameRegistry.register(Items.POGOSTICK);
     }
 
     @SideOnly(Side.CLIENT)
@@ -41,7 +46,7 @@ public class Features
     {
         final ItemModelMesher itemMesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
 
-        itemMesher.register(pogoStick, 0, new ModelResourceLocation("pogostick:pogo_stick", "inventory"));
+        itemMesher.register(Items.POGOSTICK, 0, new ModelResourceLocation("pogostick:pogo_stick", "inventory"));
     }
 
 
@@ -65,7 +70,7 @@ public class Features
         final ItemStack slimeBlocks = new ItemStack(Blocks.SLIME_BLOCK);
         final ItemStack pistons = new ItemStack(Blocks.PISTON);
 
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Features.pogoStick, 1), "ttt", " p ", " s ", 't', OREDIC_STICK, 'p', pistons, 's', slimeBlocks));
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Items.POGOSTICK, 1), "ttt", " p ", " s ", 't', OREDIC_STICK, 'p', pistons, 's', slimeBlocks));
     }
 
 
@@ -102,5 +107,23 @@ public class Features
     // -----------------------------------------------------------------------
     // Commands
     // -----------------------------------------------------------------------
+
+
+
+    // -----------------------------------------------------------------------
+    // Enchantments
+    // -----------------------------------------------------------------------
+
+    public static class Enchantments
+    {
+        public static final Enchantment SPRING = new EnchantmentSpring(Enchantment.Rarity.COMMON, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND });
+    }
+
+
+    public static void registerEnchantments()
+    {
+        GameRegistry.register(Enchantments.SPRING);
+    }
+
 
 }

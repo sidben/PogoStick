@@ -35,6 +35,7 @@ public abstract class CommonProxy implements IProxy
         // Recipes
         Features.registerRecipes();
         Features.registerStats();
+        Features.registerEnchantments();
     }
 
 

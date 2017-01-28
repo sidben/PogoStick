@@ -3,3 +3,6 @@ pogostick:item.pogo_stick.name=Pogo Stick
 
 # Stats
 pogostick:stat.times_bounced=Times bounced
+
+# Enchantments
+pogostick:enchantment.spring=Spring

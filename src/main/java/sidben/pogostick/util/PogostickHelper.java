@@ -29,7 +29,7 @@ public class PogostickHelper
      */
     public static boolean canEntityActivatePogostick(@Nonnull EntityLivingBase entity)
     {
-        final boolean isHoldingPogostick = (entity.getHeldItemMainhand().getItem() == Features.pogoStick || entity.getHeldItemOffhand().getItem() == Features.pogoStick);
+        final boolean isHoldingPogostick = (entity.getHeldItemMainhand().getItem() == Features.Items.POGOSTICK || entity.getHeldItemOffhand().getItem() == Features.Items.POGOSTICK);
 
         // TODO: negate activation if the player has a food item in the other hand (or another item that is used with right-click)
 
@@ -91,7 +91,7 @@ public class PogostickHelper
         if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) { return; }
 
         // Have a pogostick right now?
-        if (pogoStack.getItem() != Features.pogoStick) { return; }
+        if (pogoStack.getItem() != Features.Items.POGOSTICK) { return; }
 
 
         if (entity.world.isRemote) {
