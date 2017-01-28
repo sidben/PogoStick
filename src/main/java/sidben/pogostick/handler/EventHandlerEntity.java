@@ -14,10 +14,10 @@ import net.minecraftforge.event.entity.player.PlayerFlyableFallEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import sidben.pogostick.ModPogoStick;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
 import sidben.pogostick.main.Features;
+import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.util.LogHelper;
 import sidben.pogostick.util.PogostickHelper;
 
@@ -33,39 +33,36 @@ public class EventHandlerEntity
 
 
     @SubscribeEvent
-    public void onPlayerFallEvent(PlayerFlyableFallEvent event)
+    public static void onPlayerFallEvent(PlayerFlyableFallEvent event)
     {
         // Fall on creative mode
-        this.handleEntityFall(event);
+        handleEntityFall(event);
     }
 
     @SubscribeEvent
-    public void onLivingFallEvent(LivingFallEvent event)
+    public static void onLivingFallEvent(LivingFallEvent event)
     {
         // Fall on survival mode
-        this.handleEntityFall(event);
+        handleEntityFall(event);
     }
 
 
 
-    private void handleEntityFall(LivingEvent event)
+    private static void handleEntityFall(LivingEvent event)
     {
         if (event.getEntityLiving() == null) { return; }
 
 
         final EntityLivingBase entity = event.getEntityLiving();
         float distance = 0.0F;
-        float damageMultiplier = 0.0F;
-
-
         // Find the correct data from valid events
         if (event instanceof LivingFallEvent) {
             distance = ((LivingFallEvent) event).getDistance();
-            damageMultiplier = ((LivingFallEvent) event).getDamageMultiplier();
+            // damageMultiplier = ((LivingFallEvent) event).getDamageMultiplier();
 
         } else if (event instanceof PlayerFlyableFallEvent) {
             distance = ((PlayerFlyableFallEvent) event).getDistance();
-            damageMultiplier = ((PlayerFlyableFallEvent) event).getMultiplier();
+            // damageMultiplier = ((PlayerFlyableFallEvent) event).getMultiplier();
 
         }
 
@@ -103,7 +100,7 @@ public class EventHandlerEntity
                 if (!event.getEntityLiving().world.isRemote) {
                     pogostickStatus.updatePogostickUsage(false);
                     if (entity instanceof EntityPlayer) {
-                        ModPogoStick.instance.getNetworkManager().sendPogoStatusUpdate(false, (EntityPlayer) entity);
+                        NetworkManager.sendPogoStatusUpdate(false, (EntityPlayer) entity);
                     }
                 }
 
@@ -117,7 +114,7 @@ public class EventHandlerEntity
 
 
     @SubscribeEvent
-    public void onEntityJoinWorld(EntityJoinWorldEvent event)
+    public static void onEntityJoinWorld(EntityJoinWorldEvent event)
     {
         /*
          * if (event.getEntity() instanceof EntityPlayer) {
@@ -146,7 +143,7 @@ public class EventHandlerEntity
 
 
     @SubscribeEvent
-    public void onLivingUpdateEvent(LivingUpdateEvent event)
+    public static void onLivingUpdateEvent(LivingUpdateEvent event)
     {
         if (event.getEntityLiving() == null) { return; }
         if (event.getEntityLiving().world.isRemote) { return; }
@@ -164,7 +161,7 @@ public class EventHandlerEntity
 
                 // If it's a player, send the status update to client
                 if (entity instanceof EntityPlayer) {
-                    ModPogoStick.instance.getNetworkManager().sendPogoStatusUpdate(false, (EntityPlayer) entity);
+                    NetworkManager.sendPogoStatusUpdate(false, (EntityPlayer) entity);
                 }
             }
 
@@ -175,34 +172,13 @@ public class EventHandlerEntity
 
 
     @SubscribeEvent
-    public void onPlayerTickEvent(TickEvent.PlayerTickEvent event)
+    public static void onPlayerTickEvent(TickEvent.PlayerTickEvent event)
     {
         final EntityLivingBase entity = event.player;
-
-
-        /*
-         *
-         * if (entity.onGround) {
-         * BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain(entity.posX, entity.getEntityBoundingBox().minY - 1.0D, entity.posZ);
-         *
-         * float f6 = entity.world.getBlockState(blockpos$pooledmutableblockpos).getBlock().slipperiness * 0.91F;
-         * float f7 = 0.16277136F / (f6 * f6 * f6);
-         * float f8 = entity.getAIMoveSpeed() * f7;
-         *
-         * blockpos$pooledmutableblockpos.release();
-         *
-         * //LogHelper.info(String.format("                         Block slipperness %.6f / Friction %.6f", f6, f8));
-         * }
-         *
-         *
-         */
-
-
 
         if (event.phase == Phase.END && entity != null && entity.world.isRemote) {
             PogostickHelper.removeAirFrictionIfUsingPogostick(entity);
         }
-
     }
 
 

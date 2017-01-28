@@ -30,9 +30,9 @@ public class DelayedEventHandlerBounceEntity extends DelayedEventHandler<PlayerT
     public void execute(PlayerTickEvent event)
     {
         LogHelper.debug("DelayedEventHandlerBounceEntity.execute()");
-        // LogHelper.debug(">   entity %s has fallen %.4f at speed %.4f", event.player, this._originalDistance, this._originalMotionY);
-        // LogHelper.debug(">   MotionY - Current %.4f, original: %.4f", event.player.motionY, this._originalMotionY);
-        // LogHelper.debug(">   Player pos -  X: %.3f, Y: %.3f, Z: %.3f", event.player.posX, event.player.posY, event.player.posZ);
+        // LogHelper.debug("> entity %s has fallen %.4f at speed %.4f", event.player, this._originalDistance, this._originalMotionY);
+        // LogHelper.debug("> MotionY - Current %.4f, original: %.4f", event.player.motionY, this._originalMotionY);
+        // LogHelper.debug("> Player pos - X: %.3f, Y: %.3f, Z: %.3f", event.player.posX, event.player.posY, event.player.posZ);
 
         final EntityPlayer entity = event.player;
         if (entity == null || entity.isDead) { return; }

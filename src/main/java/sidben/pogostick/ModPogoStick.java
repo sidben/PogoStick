@@ -6,8 +6,8 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import sidben.pogostick.handler.ConfigurationHandler;
-import sidben.pogostick.network.NetworkManager;
+import sidben.pogostick.handler.EventHandlerConfig;
+import sidben.pogostick.main.ModConfig;
 import sidben.pogostick.proxy.IProxy;
 import sidben.pogostick.reference.Reference;
 
@@ -17,31 +17,19 @@ public class ModPogoStick
 {
 
     @Mod.Instance(Reference.ModID)
-    public static ModPogoStick  instance;
+    public static ModPogoStick instance;
 
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
-    public static IProxy        proxy;
-
-    private NetworkManager      _networkManager;
-
-
-
-    public NetworkManager getNetworkManager()
-    {
-        if (_networkManager == null) {
-            _networkManager = new NetworkManager();
-        }
-        return _networkManager;
-    }
+    public static IProxy       proxy;
 
 
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        // Loads config
-        ConfigurationHandler.init(event.getSuggestedConfigurationFile());
-        MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
+        // Config
+        ModConfig.init(event.getSuggestedConfigurationFile());
+        MinecraftForge.EVENT_BUS.register(EventHandlerConfig.class);
 
         // Sided pre-initialization
         proxy.pre_initialize();

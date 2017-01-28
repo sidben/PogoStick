@@ -15,9 +15,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
-import sidben.pogostick.ModPogoStick;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
+import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.reference.Reference;
 import sidben.pogostick.util.LogHelper;
 import sidben.pogostick.util.PogostickHelper;
@@ -102,20 +102,19 @@ public class ItemPogoStick extends Item
             if (!pogostickStatus.isUsingPogostick()) {
                 shouldEnablePogostick = PogostickHelper.canEntityActivatePogostick(playerIn);
                 if (!shouldEnablePogostick) {
-                    LogHelper.debug("    pogostick denied");
-                    // playerIn.playSound(SoundEvents.BLOCK_SLIME_HIT, 1.8F, 1.8F); // don't work, must be on client
+                    LogHelper.trace("Pogostick activation denied to %s. NO BOUNCE FOR YOU!", playerIn);
                 }
             }
 
-            LogHelper.debug("> capability - isUsing (pre, fresh) == %s", playerIn.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick());
-            LogHelper.debug("> should enable: %s (changed %s)", shouldEnablePogostick, (shouldEnablePogostick != pogostickStatus.isUsingPogostick()));
+            // LogHelper.debug("> capability - isUsing (pre, fresh) == %s", playerIn.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick());
+            // LogHelper.debug("> should enable: %s (changed %s)", shouldEnablePogostick, (shouldEnablePogostick != pogostickStatus.isUsingPogostick()));
 
             if (shouldEnablePogostick != pogostickStatus.isUsingPogostick()) {
                 pogostickStatus.updatePogostickUsage(shouldEnablePogostick);
-                ModPogoStick.instance.getNetworkManager().sendPogoStatusUpdate(shouldEnablePogostick, playerIn);
+                NetworkManager.sendPogoStatusUpdate(shouldEnablePogostick, playerIn);
             }
 
-            LogHelper.debug("> capability - isUsing (pos, fresh) == %s", playerIn.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick());
+            // LogHelper.debug("> capability - isUsing (pos, fresh) == %s", playerIn.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick());
 
 
             // TODO: check interaction with chests, etc

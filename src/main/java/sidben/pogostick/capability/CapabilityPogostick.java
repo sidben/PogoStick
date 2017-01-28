@@ -1,13 +1,11 @@
 package sidben.pogostick.capability;
 
-import java.util.concurrent.Callable;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import sidben.pogostick.util.LogHelper;
 
 
 public class CapabilityPogostick
@@ -24,12 +22,12 @@ public class CapabilityPogostick
     }
 
 
-    
+
     static class DefaultImplementation implements IPogostick
     {
         @Override
-        public void updatePogostickUsage(boolean isActive) 
-        { 
+        public void updatePogostickUsage(boolean isActive)
+        {
         }
 
         @Override
@@ -38,8 +36,8 @@ public class CapabilityPogostick
             return false;
         }
     }
-    
-    
+
+
 
     static class DefaultStoragePogostick implements IStorage<IPogostick>
     {

@@ -5,14 +5,13 @@ import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 
 /**
  * Event handler that should only execute once, after a certain time.
- * 
+ *
  * Works for EntityEvent and PlayerTickEvent.
  */
 public abstract class DelayedEventHandler<T extends Event>
@@ -36,31 +35,31 @@ public abstract class DelayedEventHandler<T extends Event>
     {
         return this._entityAffected;
     }
-    
-    
+
+
     protected Entity getEventEntity(T event)
     {
-        if (event instanceof EntityEvent) return ((EntityEvent) event).getEntity();
-        if (event instanceof PlayerTickEvent) return ((PlayerTickEvent) event).phase == Phase.END ? ((PlayerTickEvent) event).player : null;
+        if (event instanceof EntityEvent) { return ((EntityEvent) event).getEntity(); }
+        if (event instanceof PlayerTickEvent) { return ((PlayerTickEvent) event).phase == Phase.END ? ((PlayerTickEvent) event).player : null; }
         return null;
     }
 
-    
+
 
     // @SubscribeEvent
     /**
-     * This method must be called from onEvent() method from the inherited class. 
+     * This method must be called from onEvent() method from the inherited class.
      */
     protected void onEventInternal(T event)
     {
-        Entity eventEntity = this.getEventEntity(event);
+        final Entity eventEntity = this.getEventEntity(event);
         if (eventEntity == null) { return; }
 
         /*
          * Since T extends EntityEvent, this class will subscribe to all 'EntityEvent', not just
          * the one implemented in the concrete class. Because of that, I need to make sure this
          * method will only work for the correct event.
-         * 
+         *
          * UPDATE: the base class no longer subscribe to event, I'll leave it to the inherited class.
          */
         if (this.isAffectedEntity(eventEntity) && event.getClass().equals(this._eventClass)) {
@@ -86,8 +85,8 @@ public abstract class DelayedEventHandler<T extends Event>
 
 
 
-    public abstract void onEvent(T event); 
-    
+    public abstract void onEvent(T event);
+
     public abstract void execute(T event);
 
 }
