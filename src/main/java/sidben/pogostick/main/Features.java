@@ -57,14 +57,15 @@ public class Features
     // -----------------------------------------------------------------------
 
     private static String OREDIC_STICK      = "stickWood";
-    private static String OREDIC_IRON_BLOCK = "blockIron";
+    // private static String OREDIC_IRON_BLOCK = "blockIron";
 
 
     public static void registerRecipes()
     {
         final ItemStack slimeBlocks = new ItemStack(Blocks.SLIME_BLOCK);
+        final ItemStack pistons = new ItemStack(Blocks.PISTON);
 
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Features.pogoStick, 1), "ttt", " i ", " s ", 't', OREDIC_STICK, 'i', OREDIC_IRON_BLOCK, 's', slimeBlocks));
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Features.pogoStick, 1), "ttt", " p ", " s ", 't', OREDIC_STICK, 'p', pistons, 's', slimeBlocks));
     }
 
     
