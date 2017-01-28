@@ -43,7 +43,7 @@ public class ItemPogoStick extends Item
                 // TODO: use the isEntityUsingPogoStick(), that should be moved elsewhere
                 // return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 
-                if (entityIn instanceof EntityLiving && entityIn.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
+                if (entityIn instanceof EntityLivingBase && entityIn.hasCapability(CapabilityPogostick.POGOSTICK, null)) {
                     final IPogostick pogostickStatus = entityIn.getCapability(CapabilityPogostick.POGOSTICK, null);
                     return pogostickStatus.isUsingPogostick() ? 1F : 0F;
                 }
