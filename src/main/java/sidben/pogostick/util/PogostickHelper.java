@@ -159,16 +159,15 @@ public class PogostickHelper
         }
 
 
-        LogHelper.debug(">>> Fall distance %.4f (from %.4f)", adjustedFallDistance, fallDistance);
-        LogHelper.debug(">>> Old motionY %.4f", entity.motionY);
+        // LogHelper.debug(">>> Fall distance %.4f (from %.4f)", adjustedFallDistance, fallDistance);
+        // LogHelper.debug(">>> Old motionY %.4f", entity.motionY);
 
         final double newSpeed = minMotion + Math.log(Math.max(adjustedFallDistance, 1)) * lastModifier;
         entity.motionY = Math.min(newSpeed, MAX_MOTION_UP);
 
-        LogHelper.debug(">>> New motionY %.4f (max %.4f)", newSpeed, MAX_MOTION_UP);
-        LogHelper.debug("    ");
+        // LogHelper.debug(">>> New motionY %.4f (max %.4f)", newSpeed, MAX_MOTION_UP);
+        // LogHelper.debug("    ");
 
-        entity.isAirBorne = true;
         entity.onGround = false;
     }
 
@@ -201,59 +200,84 @@ public class PogostickHelper
     /**
      * Try to apply the Frost Walker effect on the block below the given entity.
      * This method DO NOT perform capability validations.
-     *
-     * {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby(EntityLivingBase living, World worldIn, BlockPos pos, int level)}
-     *
-     * @param pos
-     *            Block position below the player feet.
      */
-    public static void tryfrostBounce(EntityLivingBase entity)
+    public static void tryFrostBounce(EntityLivingBase entity)
     {
         if (entity.world.isRemote) { return; }
 
+        
+        // TODO: BUG - not working well after branch rebase to get bouncing implementation
 
         final ItemStack playerItemStack = entity.getHeldItemMainhand();
 
         if (isPogoStack(playerItemStack)) {
             final int freezeLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FROST_WALKER, playerItemStack);
-            LogHelper.trace("$$  Testing for frost walker - level: %d", freezeLevel);
+            // LogHelper.trace("$$  Testing for frost walker - level: %d", freezeLevel);
 
 
             if (freezeLevel > 0) {
                 final World world = entity.world;
-                final BlockPos blockpos = new BlockPos(entity);
-                final IBlockState blockstateBelow = world.getBlockState(blockpos.down());
+                final int checkingDistance = 2;
+                boolean effectApplied = false;
+                
+                // Check up to 2 blocks below the player
+                for (int i = checkingDistance; i >= 0; i--) {
+                    final BlockPos blockpos = new BlockPos(entity).down(i);
+                    final IBlockState blockstateBelow = world.getBlockState(blockpos.down());
+                    final IBlockState blockstate = world.getBlockState(blockpos);
 
+                    LogHelper.trace("  Testing #%d, %s == %s, %s == %s (player Y %.2f), already applied %s", i, blockpos, blockstate.getBlock().getLocalizedName(), blockpos.down(), blockstateBelow.getBlock().getLocalizedName(), entity.posY, effectApplied);
+                    if (effectApplied) break;
 
-                if (blockstateBelow.getMaterial() == Material.WATER && blockstateBelow.getValue(BlockLiquid.LEVEL).equals(0)) {
-                    LogHelper.trace("$$  Freeeeeze!");
-                    // TODO: achievement
+                    
+                    if (blockstate.getMaterial() == Material.AIR 
+                            && (blockstateBelow.getMaterial() == Material.WATER && blockstateBelow.getValue(BlockLiquid.LEVEL).equals(0))
+                                ) {
 
-                    /**
-                     * Tweaked implementation of {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby()}
-                     */
-                    final double f = Math.min(16, freezeLevel + 1);
-                    final BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(0, 0, 0);
+                        LogHelper.trace("$$  Freeeeeze!");
+                        LogHelper.trace("  Accepted %s - %s, attempt %d", blockpos, blockstateBelow.getBlock().getLocalizedName(), i);
+                        // TODO: achievement
 
-                    for (final BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(blockpos.add((-f), -1.0D, (-f)), blockpos.add(f, -1.0D, f))) {
-                        if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= f * f) {
-                            blockpos$mutableblockpos.setPos(blockpos$mutableblockpos1.getX(), blockpos$mutableblockpos1.getY() + 1, blockpos$mutableblockpos1.getZ());
-                            final IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
+                        /**
+                         * Tweaked implementation of {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby()}
+                         */
+                        final double f = Math.min(16, freezeLevel + 2);
+                        final BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(0, 0, 0);
 
-                            if (iblockstate.getMaterial() == Material.AIR) {
-                                final IBlockState iblockstate1 = world.getBlockState(blockpos$mutableblockpos1);
+                        
+                        LogHelper.debug("  %d, f = %.2f", freezeLevel, f);
+                        
+                        for (final BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(blockpos.add((-f), -1.0D, (-f)), blockpos.add(f, -1.0D, f))) {
+                            if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, blockpos.getY() + 1 + i, entity.posZ) <= f * f) {
+                            //if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= f * f) {
+                                LogHelper.debug("    +-- ", freezeLevel, f);
+                                
+                                blockpos$mutableblockpos.setPos(blockpos$mutableblockpos1.getX(), blockpos$mutableblockpos1.getY() + 1, blockpos$mutableblockpos1.getZ());
+                                final IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
+                                /*
+                                LogHelper.debug("  -- " + blockpos$mutableblockpos);
+                                LogHelper.debug("     " + iblockstate);
+                                LogHelper.debug("     " + (iblockstate.getMaterial()== Material.AIR));
+                                */
+                                
 
-                                if (iblockstate1.getMaterial() == Material.WATER && iblockstate1.getValue(BlockLiquid.LEVEL).intValue() == 0
-                                        && world.mayPlace(Blocks.FROSTED_ICE, blockpos$mutableblockpos1, false, EnumFacing.DOWN, (Entity) null)) {
-                                    world.setBlockState(blockpos$mutableblockpos1, Blocks.FROSTED_ICE.getDefaultState());
-                                    world.scheduleUpdate(blockpos$mutableblockpos1.toImmutable(), Blocks.FROSTED_ICE, MathHelper.getInt(entity.getRNG(), 60, 120));
+                                if (iblockstate.getMaterial() == Material.AIR) {
+                                    final IBlockState iblockstate1 = world.getBlockState(blockpos$mutableblockpos1);
+
+                                    if (iblockstate1.getMaterial() == Material.WATER && iblockstate1.getValue(BlockLiquid.LEVEL).intValue() == 0
+                                            && world.mayPlace(Blocks.FROSTED_ICE, blockpos$mutableblockpos1, false, EnumFacing.DOWN, (Entity) null)) {
+                                        world.setBlockState(blockpos$mutableblockpos1, Blocks.FROSTED_ICE.getDefaultState());
+                                        world.scheduleUpdate(blockpos$mutableblockpos1.toImmutable(), Blocks.FROSTED_ICE, MathHelper.getInt(entity.getRNG(), 60, 120));
+                                        effectApplied = true;
+                                    }
                                 }
                             }
+                        
                         }
+
                     }
 
                 }
-
 
             }
 

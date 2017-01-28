@@ -143,6 +143,13 @@ public class EventHandlerEntity
     @SubscribeEvent
     public static void onLivingUpdateEvent(LivingUpdateEvent event)
     {
+        /*
+        if (event.getEntityLiving() instanceof EntityPlayer) {
+            LogHelper.trace("%s['%s'/%d] - Pos: %.1f, %.1f, %.1f - Server: %s, %s, %s", event.getEntityLiving().getClass().getSimpleName(), event.getEntityLiving().getName(), event.getEntityLiving().getEntityId(),
+                    event.getEntityLiving().posX, event.getEntityLiving().posY, event.getEntityLiving().posZ, event.getEntityLiving().serverPosX, event.getEntityLiving().serverPosY, event.getEntityLiving().serverPosZ);
+        }
+        */
+        
         if (event.getEntityLiving() == null) { return; }
         if (event.getEntityLiving().world.isRemote) { return; }
 
@@ -165,9 +172,10 @@ public class EventHandlerEntity
             } else {
                 // Special rule for Frost Walking. Only test when the player is falling
                 // OBS: motionY on ground will be -0.07840 due to 'gravity', but I can just check for zero since I also check onGround.
-                if (!entity.onGround && entity.motionY < 0F && entity.hasCapability(CapabilityPogostick.POGOSTICK, null)
+                if (!entity.onGround && entity.motionY < 0F 
+                        && entity.hasCapability(CapabilityPogostick.POGOSTICK, null)
                         && entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) {
-                    PogostickHelper.tryfrostBounce(entity);
+                    PogostickHelper.tryFrostBounce(entity);
                 }
 
             }
