@@ -31,7 +31,6 @@ public class EventHandlerEntity
 {
 
 
-
     @SubscribeEvent
     public static void onPlayerFallEvent(PlayerFlyableFallEvent event)
     {
@@ -163,6 +162,14 @@ public class EventHandlerEntity
                 if (entity instanceof EntityPlayer) {
                     NetworkManager.sendPogoStatusUpdate(false, (EntityPlayer) entity);
                 }
+
+            } else {
+                // Special rule for Frost Walking. Only test when the player is falling
+                // OBS: motionY on ground will be -0.07840 due to 'gravity', but I can just check for zero since I also check onGround.
+                if (!entity.onGround && entity.motionY < 0F && entity.hasCapability(CapabilityPogostick.POGOSTICK, null) && entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) {
+                    PogostickHelper.tryfrostBounce(entity);
+                }
+                
             }
 
         }

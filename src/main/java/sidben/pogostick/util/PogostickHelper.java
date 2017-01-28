@@ -1,12 +1,23 @@
 package sidben.pogostick.util;
 
 import javax.annotation.Nonnull;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import sidben.pogostick.capability.CapabilityPogostick;
+import sidben.pogostick.item.ItemPogoStick;
 import sidben.pogostick.main.Features;
 
 
@@ -177,5 +188,75 @@ public class PogostickHelper
         // LogHelper.debug("+ Air motion(pos): %.4f, %.4f", entity.motionX, entity.motionZ);
         // LogHelper.debug("+---------------------------------+");
     }
+    
+    
+
+    /**
+     * Try to apply the Frost Walker effect on the block below the given entity.
+     * This method DO NOT perform capability validations.
+     * 
+     *  {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby(EntityLivingBase living, World worldIn, BlockPos pos, int level)}
+     * 
+     * @param pos Block position below the player feet.
+     */
+    public static void tryfrostBounce(EntityLivingBase entity)
+    {
+        if (entity.world.isRemote) return;
+
+        
+        ItemStack playerItemStack = entity.getHeldItemMainhand();
+        
+        if (ItemPogoStick.isPogoStack(playerItemStack)) {
+            int freezeLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FROST_WALKER, playerItemStack);
+            LogHelper.trace("$$  Testing for frost walker - level: %d", freezeLevel);
+            
+            
+            if (freezeLevel > 0)
+            {
+                World world = entity.world;
+                BlockPos blockpos = new BlockPos(entity);
+                IBlockState blockstateBelow = world.getBlockState(blockpos.down());
+                
+
+                if (blockstateBelow.getMaterial() == Material.WATER && ((Integer)blockstateBelow.getValue(BlockLiquid.LEVEL)).equals(0))
+                {
+                    LogHelper.trace("$$  Freeeeeze!");
+                    // TODO: achievement
+    
+                    /**
+                     * Tweaked implementation of {@link net.minecraft.enchantment.EnchantmentFrostWalker#freezeNearby()} 
+                     */
+                    double f = Math.min(16, freezeLevel + 1);
+                    BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(0, 0, 0);
+    
+                    for (BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(blockpos.add((double)(-f), -1.0D, (double)(-f)), blockpos.add((double)f, -1.0D, (double)f)))
+                    {
+                        if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= (double)(f * f))
+                        {
+                            blockpos$mutableblockpos.setPos(blockpos$mutableblockpos1.getX(), blockpos$mutableblockpos1.getY() + 1, blockpos$mutableblockpos1.getZ());
+                            IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
+    
+                            if (iblockstate.getMaterial() == Material.AIR)
+                            {
+                                IBlockState iblockstate1 = world.getBlockState(blockpos$mutableblockpos1);
+    
+                                if (iblockstate1.getMaterial() == Material.WATER && ((Integer)iblockstate1.getValue(BlockLiquid.LEVEL)).intValue() == 0 && world.mayPlace(Blocks.FROSTED_ICE, blockpos$mutableblockpos1, false, EnumFacing.DOWN, (Entity)null))
+                                {
+                                    world.setBlockState(blockpos$mutableblockpos1, Blocks.FROSTED_ICE.getDefaultState());
+                                    world.scheduleUpdate(blockpos$mutableblockpos1.toImmutable(), Blocks.FROSTED_ICE, MathHelper.getInt(entity.getRNG(), 60, 120));
+                                }
+                            }
+                        }
+                    }
+
+                }
+                
+
+            }
+
+        }
+
+    }
+     
 
 }
