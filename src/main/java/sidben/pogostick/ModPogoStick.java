@@ -12,6 +12,22 @@ import sidben.pogostick.proxy.IProxy;
 import sidben.pogostick.reference.Reference;
 
 
+/*
+ *  Features/magic branch goals:
+ * 
+ * x Allow the pogostick to be enchanted on enchanting table. Valid enchantments: Unbreaking (partially vanilla behavior)
+ * 
+ * x Allow the pogostick to get Mending via books (anvil) - vanilla behavior
+ * x Allow the pogostick to get Frost Walker via books (anvil)
+ * x Allow the pogostick to get Curse of Vanishing via books (anvil) - vanilla behavior
+ * 
+ * - Custom implementation of Frost Walker - freeze water where the pogostick lands
+ * 
+ * - Check if potion of speed works as expected
+ * - Check if potion of leaping works as expected
+ */
+
+
 @Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion)
 public class ModPogoStick
 {
