@@ -1,6 +1,7 @@
 package sidben.pogostick.util;
 
 import javax.annotation.Nonnull;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -18,38 +19,45 @@ public class PogostickHelper
     private final static int   MAX_DAMAGE_TO_POGOSTICK          = 10;
 
     public final static float  MIN_DISTANCE_TO_BOUNCE           = 1.1F;
-
-
-
-    public static boolean canEntityActivatePogostick(@Nonnull EntityLivingBase entity)
-    {
-        final ItemStack heldPogostick = getHeldPogostick(entity);
-
-        // TODO: negate activation if the player has a food item in the other hand (or another item that is used with right-click)
-        // TODO: test sleeping
-
-        return entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
-                && !entity.onGround && entity.isEntityAlive() 
-                && !(entity.isInWater() || entity.isInLava()) 
-                && !entity.isElytraFlying()
-                && heldPogostick != ItemStack.EMPTY;
-    }
+    // TODO: remove fallSpeed, not used
 
 
 
     /**
-     * Returns the ItemStack with the pogostick being held by the given entity.
-     * Return ItemStack.EMPTY if invalid.
-     * This method DO NOT realize capability validation;
+     * Returns true if the given entity can activate the pogostick.
+     *
+     * This method should be used in {@link sidben.pogostick.item.ItemPogoStick ItemPogoStick} to decide the item action.
      */
-    @Deprecated // TODO: better implementation, this method may be removed
-    private static ItemStack getHeldPogostick(@Nonnull EntityLivingBase entity)
+    public static boolean canEntityActivatePogostick(@Nonnull EntityLivingBase entity)
     {
-        if (entity.getHeldItemMainhand().getItem() == Features.pogoStick
-                && entity.getHeldItemMainhand().getItemDamage() < entity.getHeldItemMainhand().getMaxDamage()) { return entity.getHeldItemMainhand(); }
-        if (entity.getHeldItemOffhand().getItem() == Features.pogoStick
-                && entity.getHeldItemOffhand().getItemDamage() < entity.getHeldItemOffhand().getMaxDamage()) { return entity.getHeldItemOffhand(); }
-        return ItemStack.EMPTY;
+        final boolean isHoldingPogostick = (entity.getHeldItemMainhand().getItem() == Features.pogoStick || entity.getHeldItemOffhand().getItem() == Features.pogoStick);
+
+        // TODO: negate activation if the player has a food item in the other hand (or another item that is used with right-click)
+
+        return !entity.onGround 
+                && isHoldingPogostick 
+                && canEntityKeepUsingPogostick(entity);
+    }
+
+
+    /**
+     * Returns true if the given entity can keep using the pogostick. It's assumed that the entity
+     * already started using it.
+     *
+     * This method is mainly used in {@link sidben.pogostick.handler.EventHandlerEntity#onLivingUpdateEvent() EventHandlerEntity.onLivingUpdateEvent()}
+     * to disable the pogostick if certain conditions are no longer valid.
+     */
+    public static boolean canEntityKeepUsingPogostick(@Nonnull EntityLivingBase entity)
+    {
+        return entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
+                && entity.isEntityAlive()
+                && !entity.isRiding()
+                && !entity.isOnLadder()
+                && !(entity.isInWater() || entity.isInLava())
+                // && !(entity.isInsideOfMaterial(Material.WATER) || entity.isInsideOfMaterial(Material.LAVA))  // TODO: check with other mods liquids  
+                && !entity.isElytraFlying();
+        
+        // OBS: entity.isInsideOfMaterial(Material.WATER) DON'T detect if the player has just the feet in water, inInWater() does.
     }
 
 
@@ -60,7 +68,7 @@ public class PogostickHelper
     public static int calculateItemDamage(float fallDistance)
     {
         if (fallDistance < MIN_DISTANCE_TO_DAMAGE_POGOSTICK) { return 0; }
-        final float rawDamage = MathHelper.sqrt(fallDistance * 0.3F);
+        final float rawDamage = MathHelper.sqrt(fallDistance * 0.35F);
         return (int) MathHelper.clamp(Math.floor(rawDamage), 1, MAX_DAMAGE_TO_POGOSTICK);
     }
 
@@ -68,26 +76,22 @@ public class PogostickHelper
 
     /**
      * Process what should happen when an entity lands with an active pogostick.
-     * Capability validation is also performed inside this method.
+     * Capability validation is also performed inside this method.<br/>
+     * <br/>
      *
      * This method process actions for both, client and server. On client it updates
      * just the vertical motion and play the item sounds. On server it damages the item.
+     * This method DO NOT negate fall damage.<br/>
+     * <br/>
      *
-     * This method DO NOT negate fall damage.
+     * This method will probably be called by {@link sidben.pogostick.handler.DelayedEventHandlerBounceEntity#execute() DelayedEventHandlerBounceEntity.execute()}.
      */
-    public static void processEntityLandingWithPogostick(@Nonnull EntityLivingBase entity, float fallDistance, double fallSpeed)
+    public static void processEntityLandingWithPogostick(@Nonnull EntityLivingBase entity, ItemStack pogoStack, float fallDistance, double fallSpeed)
     {
         if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) { return; }
 
         // Have a pogostick right now?
-        ItemStack pogoStack = ItemStack.EMPTY;
-        if (entity.getHeldItemMainhand().getItem() == Features.pogoStick) {
-            pogoStack = entity.getHeldItemMainhand();
-        } else if (entity.getHeldItemOffhand().getItem() == Features.pogoStick) {
-            pogoStack = entity.getHeldItemOffhand();
-        } else {
-            return;
-        }
+        if (pogoStack.getItem() != Features.pogoStick) { return; }
 
 
         if (entity.world.isRemote) {
@@ -99,6 +103,8 @@ public class PogostickHelper
             LogHelper.trace("A fall from %.4f will cause %d damage to the pogostick", fallDistance, damageAmount);
             if (damageAmount > 0) {
                 pogoStack.damageItem(damageAmount, entity);
+
+                // TODO: if the damage breaks the pogostick, the remaining damage goes to the player (secret achievement?)
             }
 
         }
@@ -108,10 +114,7 @@ public class PogostickHelper
 
     private static void updateVerticalMotion(@Nonnull EntityLivingBase entity, float fallDistance, double fallSpeed)
     {
-        // TODO: extra increase if jumping (will cause problems with elytra?)
-        // TODO: sprinting lower the max jump but increases the horizontal speed
-
-        float adjustedFallDistance = fallDistance;
+        float adjustedFallDistance = fallDistance * 0.8F;
         float minMotion = 0.6F;
         float lastModifier = 0.4F;
 
@@ -123,12 +126,12 @@ public class PogostickHelper
                 minMotion = 0.75F;
 
             } else if (entity.isSprinting()) {
-                // If the player is sprinting the bounce height limit is lower, but accelerates faster 
-                // (horizontal speed should be increased)
+                // If the player is sprinting the bounce height limit is lower, but accelerates faster
+                // (horizontal speed should be increased naturally)
                 LogHelper.debug("  Applying sprinting modifier");
                 lastModifier = 0.25F;
-                
-            }
+
+            } 
         }
 
 
