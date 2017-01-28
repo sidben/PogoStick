@@ -88,6 +88,9 @@ public class ItemPogoStick extends Item
     @Override
     public int getItemEnchantability()
     {
+        // Since the only non-treasure enchantment possible is Unbreaking, this
+        // item needs a high enchantability to enable the first row of enchanting, 
+        // without bookshelves.
         return 17;
     }
 
