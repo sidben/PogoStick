@@ -310,11 +310,18 @@ public class PogostickHelper
 
                     }
 
+                } // for (int i = checkingDistance; i >= 0; i--)
+                
+
+                // Achievement
+                if (effectApplied && entity instanceof EntityPlayer) {
+                    ((EntityPlayer) entity).addStat(Features.Stats.BOUNCE_ON_WATER);                    
                 }
+                
 
-            }
+            } // if (freezeLevel > 0)
 
-        }
+        } // if (isPogoStack(playerItemStack))
 
     }
 

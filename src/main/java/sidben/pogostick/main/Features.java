@@ -65,7 +65,6 @@ public class Features
     // -----------------------------------------------------------------------
 
     private static String OREDIC_STICK = "stickWood";
-    // private static String OREDIC_IRON_BLOCK = "blockIron";
 
 
     public static void registerRecipes()
@@ -107,8 +106,7 @@ public class Features
     public static void registerStats()
     {
         Stats.TIMES_BOUNCED.registerStat();
-        Stats.BOUNCE_ONE_CM.registerStat();
-        /** See {@link net.minecraft.entity.player#addMovementStat(double x, double y, double z)} */
+        Stats.BOUNCE_ONE_CM.registerStat(); /** See {@link net.minecraft.entity.player#addMovementStat(double x, double y, double z)} */
 
         final AchievementPage feats = new AchievementPage(Reference.ModName, Stats.BIG_FALL, Stats.BOUNCE_ON_WATER, Stats.BREAK_POGOSTICK, Stats.USE_POGOSTICK, Stats.KILL_BOUNCING_MONSTER,
                 Stats.KILL_MONSTER);
