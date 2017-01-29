@@ -1,7 +1,6 @@
 package sidben.pogostick.proxy;
 
 import net.minecraftforge.common.MinecraftForge;
-import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.handler.EventHandlerCapability;
 import sidben.pogostick.handler.EventHandlerEntity;
 import sidben.pogostick.main.Features;

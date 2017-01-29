@@ -56,7 +56,7 @@ public class Features
     // Recipes
     // -----------------------------------------------------------------------
 
-    private static String OREDIC_STICK      = "stickWood";
+    private static String OREDIC_STICK = "stickWood";
     // private static String OREDIC_IRON_BLOCK = "blockIron";
 
 
@@ -68,28 +68,26 @@ public class Features
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Features.pogoStick, 1), "ttt", " p ", " s ", 't', OREDIC_STICK, 'p', pistons, 's', slimeBlocks));
     }
 
-    
-    
-    
+
+
     // -----------------------------------------------------------------------
     // Achievements and Stats
     // -----------------------------------------------------------------------
 
-    public static class Stats 
+    public static class Stats
     {
         public static final StatBase TIMES_BOUNCED = new StatBasic("stat.timesBounced", new TextComponentTranslation("pogostick:stat.times_bounced", new Object[0]));
     }
-    
-    
-    
+
+
+
     public static void registerStats()
     {
         Stats.TIMES_BOUNCED.registerStat();
     }
-    
 
-    
-    
+
+
     // -----------------------------------------------------------------------
     // Capabilities
     // -----------------------------------------------------------------------
@@ -98,8 +96,8 @@ public class Features
     {
         CapabilityPogostick.register();
     }
-    
-    
+
+
 
     // -----------------------------------------------------------------------
     // Commands
