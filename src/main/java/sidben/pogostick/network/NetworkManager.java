@@ -12,27 +12,27 @@ import sidben.pogostick.util.LogHelper;
 public class NetworkManager
 {
 
-    private static final String  MOD_CHANNEL = "CH_SIDBEN_POGO";
-    private SimpleNetworkWrapper _networkWrapper;
+    private static final String         MOD_CHANNEL = "ch_sidben_pogo";
+    private static int                  packetdId   = 0;
+    private static SimpleNetworkWrapper _networkWrapper;
 
 
 
-    public void registerMessages()
+    public static void registerMessages()
     {
-        this._networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_CHANNEL);
+        _networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_CHANNEL);
 
-        int packetdId = 0;
-        this._networkWrapper.registerMessage(MessagePogostickStatusUpdate.Handler.class, MessagePogostickStatusUpdate.class, packetdId++, Side.CLIENT);
+        _networkWrapper.registerMessage(MessagePogostickStatusUpdate.Handler.class, MessagePogostickStatusUpdate.class, packetdId++, Side.CLIENT);
     }
 
 
 
-    public void sendPogoStatusUpdate(boolean isUsingPogostick, @Nonnull EntityPlayer player)
+    public static void sendPogoStatusUpdate(boolean isUsingPogostick, @Nonnull EntityPlayer player)
     {
         final MessagePogostickStatusUpdate message = new MessagePogostickStatusUpdate(isUsingPogostick);
         LogHelper.trace("Sending MessagePogostickStatusUpdate() - Message: %s to %s", message, player);
 
-        this._networkWrapper.sendTo(message, (EntityPlayerMP) player);
+        _networkWrapper.sendTo(message, (EntityPlayerMP) player);
     }
 
 
