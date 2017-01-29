@@ -8,6 +8,7 @@ import sidben.pogostick.reference.Reference;
 import sidben.pogostick.util.PogostickHelper;
 
 
+// TODO: effect
 public class EnchantmentSpring extends Enchantment
 {
 
@@ -72,6 +73,13 @@ public class EnchantmentSpring extends Enchantment
     public String getName()
     {
         return Reference.ModID + ":enchantment.spring";
+    }
+
+
+
+    public static float getBouncingModifier(int level)
+    {
+        return level * 1.75F;
     }
 
 

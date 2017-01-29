@@ -17,18 +17,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import sidben.pogostick.capability.CapabilityPogostick;
+import sidben.pogostick.enchantment.EnchantmentSpring;
 import sidben.pogostick.main.Features;
 
 
 public class PogostickHelper
 {
 
+    private final static float MIN_MOTION_UP                    = 0.5F;
     private final static float MAX_MOTION_UP                    = 10F;
     private final static float MIN_DISTANCE_TO_DAMAGE_POGOSTICK = 3F;
     private final static int   MAX_DAMAGE_TO_POGOSTICK          = 10;
-
-    public final static float  MIN_DISTANCE_TO_BOUNCE           = 1.1F;
-    // TODO: remove fallSpeed, not used
 
 
 
@@ -106,16 +105,21 @@ public class PogostickHelper
      *
      * This method will probably be called by {@link sidben.pogostick.handler.DelayedEventHandlerBounceEntity#execute() DelayedEventHandlerBounceEntity.execute()}.
      */
-    public static void processEntityLandingWithPogostick(@Nonnull EntityLivingBase entity, ItemStack pogoStack, float fallDistance, double fallSpeed)
+    public static void processEntityLandingWithPogostick(@Nonnull EntityLivingBase entity, ItemStack pogoStack, float fallDistance)
     {
-        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) { return; }
+        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
+                || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) { return; }
 
         // Have a pogostick right now?
         if (pogoStack.getItem() != Features.Items.POGOSTICK) { return; }
 
+        // Mark that the entity bounced once. This is not synced via packets, but this method is called by
+        // client and server so I assume they will be synced.
+        entity.getCapability(CapabilityPogostick.POGOSTICK, null).markBounced();
 
         if (entity.world.isRemote) {
-            PogostickHelper.updateVerticalMotion(entity, fallDistance, fallSpeed);
+            final int springLevel = EnchantmentHelper.getEnchantmentLevel(Features.Enchantments.SPRING, pogoStack);
+            PogostickHelper.updateVerticalMotion(entity, fallDistance, springLevel);
             entity.playSound(SoundEvents.ENTITY_SLIME_JUMP, 0.8F, 0.8F + entity.world.rand.nextFloat() * 0.4F);
 
         } else {
@@ -136,24 +140,27 @@ public class PogostickHelper
 
 
 
-    private static void updateVerticalMotion(@Nonnull EntityLivingBase entity, float fallDistance, double fallSpeed)
+    private static void updateVerticalMotion(@Nonnull EntityLivingBase entity, float fallDistance, int springLevel)
     {
-        float adjustedFallDistance = fallDistance * 0.8F;
-        float minMotion = 0.6F;
-        float lastModifier = 0.4F;
+        float minMotion = MIN_MOTION_UP;
+        float accelModifier = 0.5F;
+        final float springBonus = EnchantmentSpring.getBouncingModifier(springLevel);
+        final float distanceLimiter = 2.0F * Math.max(springBonus, 1F);
+        final float adjustedFallDistance = Math.min(distanceLimiter, fallDistance);
+
 
         if (entity instanceof EntityPlayer) {
             if (entity.isSneaking()) {
                 // If the player is sneaking the bounce limit is much lower
                 LogHelper.debug("  Applying sneaking modifier");
-                adjustedFallDistance = fallDistance * 0.25F;
-                minMotion = 0.75F;
+                accelModifier = 0.1F;
 
             } else if (entity.isSprinting()) {
                 // If the player is sprinting the bounce height limit is lower, but accelerates faster
                 // (horizontal speed should be increased naturally)
                 LogHelper.debug("  Applying sprinting modifier");
-                lastModifier = 0.25F;
+                minMotion = 0.7F;
+                accelModifier = 0.25F;
 
             }
         }
@@ -162,11 +169,11 @@ public class PogostickHelper
         // LogHelper.debug(">>> Fall distance %.4f (from %.4f)", adjustedFallDistance, fallDistance);
         // LogHelper.debug(">>> Old motionY %.4f", entity.motionY);
 
-        final double newSpeed = minMotion + Math.log(Math.max(adjustedFallDistance, 1)) * lastModifier;
-        entity.motionY = Math.min(newSpeed, MAX_MOTION_UP);
+        final double newSpeed = minMotion + Math.log(Math.max(adjustedFallDistance, 1)) * accelModifier;
+        entity.motionY = MathHelper.clamp(newSpeed, MIN_MOTION_UP, MAX_MOTION_UP);
 
-        // LogHelper.debug(">>> New motionY %.4f (max %.4f)", newSpeed, MAX_MOTION_UP);
-        // LogHelper.debug("    ");
+        // LogHelper.debug(">>> New motionY %.4f (min %.4f, max %.4f)", newSpeed, MIN_MOTION_UP, MAX_MOTION_UP);
+        // LogHelper.debug(" ");
 
         entity.onGround = false;
     }
@@ -179,7 +186,10 @@ public class PogostickHelper
      */
     public static void removeAirFrictionIfUsingPogostick(@Nonnull EntityLivingBase entity)
     {
-        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() || entity.onGround) { return; }
+        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
+                || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()
+                || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).bouncedOnce() 
+                || entity.onGround) { return; }
 
         /**
          * Ref:
@@ -205,34 +215,35 @@ public class PogostickHelper
     {
         if (entity.world.isRemote) { return; }
 
-        
+
         // TODO: BUG - not working well after branch rebase to get bouncing implementation
 
         final ItemStack playerItemStack = entity.getHeldItemMainhand();
 
         if (isPogoStack(playerItemStack)) {
             final int freezeLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FROST_WALKER, playerItemStack);
-            // LogHelper.trace("$$  Testing for frost walker - level: %d", freezeLevel);
+            // LogHelper.trace("$$ Testing for frost walker - level: %d", freezeLevel);
 
 
             if (freezeLevel > 0) {
                 final World world = entity.world;
                 final int checkingDistance = 2;
                 boolean effectApplied = false;
-                
+
                 // Check up to 2 blocks below the player
                 for (int i = checkingDistance; i >= 0; i--) {
                     final BlockPos blockpos = new BlockPos(entity).down(i);
                     final IBlockState blockstateBelow = world.getBlockState(blockpos.down());
                     final IBlockState blockstate = world.getBlockState(blockpos);
 
-                    LogHelper.trace("  Testing #%d, %s == %s, %s == %s (player Y %.2f), already applied %s", i, blockpos, blockstate.getBlock().getLocalizedName(), blockpos.down(), blockstateBelow.getBlock().getLocalizedName(), entity.posY, effectApplied);
-                    if (effectApplied) break;
+                    LogHelper.trace("  Testing #%d, %s == %s, %s == %s (player Y %.2f), already applied %s", i, blockpos, blockstate.getBlock().getLocalizedName(), blockpos.down(),
+                            blockstateBelow.getBlock().getLocalizedName(), entity.posY, effectApplied);
+                    if (effectApplied) {
+                        break;
+                    }
 
-                    
-                    if (blockstate.getMaterial() == Material.AIR 
-                            && (blockstateBelow.getMaterial() == Material.WATER && blockstateBelow.getValue(BlockLiquid.LEVEL).equals(0))
-                                ) {
+
+                    if (blockstate.getMaterial() == Material.AIR && (blockstateBelow.getMaterial() == Material.WATER && blockstateBelow.getValue(BlockLiquid.LEVEL).equals(0))) {
 
                         LogHelper.trace("$$  Freeeeeze!");
                         LogHelper.trace("  Accepted %s - %s, attempt %d", blockpos, blockstateBelow.getBlock().getLocalizedName(), i);
@@ -244,22 +255,22 @@ public class PogostickHelper
                         final double f = Math.min(16, freezeLevel + 2);
                         final BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(0, 0, 0);
 
-                        
+
                         LogHelper.debug("  %d, f = %.2f", freezeLevel, f);
-                        
+
                         for (final BlockPos.MutableBlockPos blockpos$mutableblockpos1 : BlockPos.getAllInBoxMutable(blockpos.add((-f), -1.0D, (-f)), blockpos.add(f, -1.0D, f))) {
                             if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, blockpos.getY() + 1 + i, entity.posZ) <= f * f) {
-                            //if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= f * f) {
+                                // if (blockpos$mutableblockpos1.distanceSqToCenter(entity.posX, entity.posY, entity.posZ) <= f * f) {
                                 LogHelper.debug("    +-- ", freezeLevel, f);
-                                
+
                                 blockpos$mutableblockpos.setPos(blockpos$mutableblockpos1.getX(), blockpos$mutableblockpos1.getY() + 1, blockpos$mutableblockpos1.getZ());
                                 final IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
                                 /*
-                                LogHelper.debug("  -- " + blockpos$mutableblockpos);
-                                LogHelper.debug("     " + iblockstate);
-                                LogHelper.debug("     " + (iblockstate.getMaterial()== Material.AIR));
-                                */
-                                
+                                 * LogHelper.debug("  -- " + blockpos$mutableblockpos);
+                                 * LogHelper.debug("     " + iblockstate);
+                                 * LogHelper.debug("     " + (iblockstate.getMaterial()== Material.AIR));
+                                 */
+
 
                                 if (iblockstate.getMaterial() == Material.AIR) {
                                     final IBlockState iblockstate1 = world.getBlockState(blockpos$mutableblockpos1);
@@ -272,7 +283,7 @@ public class PogostickHelper
                                     }
                                 }
                             }
-                        
+
                         }
 
                     }

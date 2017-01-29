@@ -9,7 +9,7 @@ Features/magic branch goals:
         - Custom implementation of Frost Walker - freeze water where the pogostick lands
     x Allow the pogostick to get Curse of Vanishing via books (anvil) - vanilla behavior
     x New enchantment: Spring I/II
-        - Custom implementation of Spring - raises max bounce height (regular height will be lowered)
+        x Custom implementation of Spring - raises max bounce height (regular height will be lowered)
  
     - Check if potion of speed works as expected
     - Check if potion of leaping works as expected
