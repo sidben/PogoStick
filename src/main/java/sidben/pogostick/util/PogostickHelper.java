@@ -56,6 +56,7 @@ public class PogostickHelper
                 && !(entity.isInWater() || entity.isInLava())
                 // && !(entity.isInsideOfMaterial(Material.WATER) || entity.isInsideOfMaterial(Material.LAVA))  // TODO: check with other mods liquids  
                 && !entity.isElytraFlying();
+                // && !entity.isInWeb; TODO: make isInWeb visible
         
         // OBS: entity.isInsideOfMaterial(Material.WATER) DON'T detect if the player has just the feet in water, inInWater() does.
     }
@@ -156,28 +157,22 @@ public class PogostickHelper
      */
     public static void removeAirFrictionIfUsingPogostick(@Nonnull EntityLivingBase entity)
     {
-        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() || entity.onGround) { return; }
+        if (!entity.hasCapability(CapabilityPogostick.POGOSTICK, null) 
+                || !entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() 
+                || entity.onGround) { return; }
 
-        // TODO: better formula, I want much slower acceleration
-
-        final float s1 = entity.moveStrafing * entity.moveStrafing + entity.moveForward * entity.moveForward;
-        final float s2 = Math.max(MathHelper.sqrt(s1), 1F);
-        final float factor = 0.05F / s2;
-        final float strafe = entity.moveStrafing * factor;
-        final float forward = entity.moveForward * factor;
-
-        final float xa1 = MathHelper.sin(entity.rotationYaw * 0.017453292F);
-        final float ya1 = MathHelper.cos(entity.rotationYaw * 0.017453292F);
-        final double xa2 = strafe * ya1 - forward * xa1;
-        final double ya2 = forward * ya1 + strafe * xa1;
-
-
+        /**
+         * Ref:
+         * 
+         * {@link net.minecraft.entity.EntityLivingBase#moveEntityWithHeading(float strafe, float forward)}
+         * {@link net.minecraft.entity.Entity#moveRelative(float strafe, float forward, float friction)}
+         * {@link net.minecraft.entity.Entity#move(MoverType type, double x, double y, double z)}
+         */
+        
         // LogHelper.debug("+ Air motion(pre): %.4f, %.4f", entity.motionX, entity.motionZ);
-        entity.motionX += xa2;
-        entity.motionZ += ya2;
+        entity.moveRelative(entity.moveStrafing, entity.moveForward, 0.03F);
         // LogHelper.debug("+ Air motion(pos): %.4f, %.4f", entity.motionX, entity.motionZ);
         // LogHelper.debug("+---------------------------------+");
-
     }
 
 }
