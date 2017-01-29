@@ -35,6 +35,35 @@ public class CapabilityPogostick
         {
             return false;
         }
+
+        @Override
+        public float minDistanceToBounce()
+        {
+            return 0;
+        }
+
+        @Override
+        public boolean bouncedOnce()
+        {
+            return false;
+        }
+
+        @Override
+        public void markBounced()
+        {
+        }
+
+        @Override
+        public float fallDistanceBaseLimit()
+        {
+            return 0;
+        }
+
+        @Override
+        public boolean canApplyModifiers()
+        {
+            return false;
+        }
     }
 
 

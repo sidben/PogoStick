@@ -31,10 +31,12 @@ public abstract class CommonProxy implements IProxy
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(EventHandlerEntity.class);
         MinecraftForge.EVENT_BUS.register(EventHandlerCapability.class);
+        // MinecraftForge.EVENT_BUS.register(EventHandlerAnvil.class);
 
         // Recipes
         Features.registerRecipes();
         Features.registerStats();
+        Features.registerEnchantments();
     }
 
 

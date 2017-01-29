@@ -13,7 +13,7 @@ public class DelayedEventHandlerBounceEntity extends DelayedEventHandler<PlayerT
 {
 
     private final float     _originalDistance;
-    private final double    _originalMotionY;
+    // private final double _originalMotionY;
     private final ItemStack _pogoStack;
 
 
@@ -21,7 +21,7 @@ public class DelayedEventHandlerBounceEntity extends DelayedEventHandler<PlayerT
     public DelayedEventHandlerBounceEntity(int ticksToWait, Entity entityAffected, ItemStack pogoStack, float fallDistance) {
         super(ticksToWait, entityAffected, PlayerTickEvent.class);
         this._originalDistance = fallDistance;
-        this._originalMotionY = entityAffected.motionY;
+        // this._originalMotionY = entityAffected.motionY;
         this._pogoStack = pogoStack;
     }
 
@@ -37,7 +37,7 @@ public class DelayedEventHandlerBounceEntity extends DelayedEventHandler<PlayerT
         final EntityPlayer entity = event.player;
         if (entity == null || entity.isDead) { return; }
 
-        PogostickHelper.processEntityLandingWithPogostick(entity, this._pogoStack, this._originalDistance, this._originalMotionY);
+        PogostickHelper.processEntityLandingWithPogostick(entity, this._pogoStack, this._originalDistance);
     }
 
 

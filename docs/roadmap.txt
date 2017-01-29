@@ -1,0 +1,19 @@
+
+
+Features/magic branch goals:
+----------------------------------------------------------------------------------------------------------------------------
+
+    x Allow the pogostick to be enchanted on enchanting table. Valid enchantments: Unbreaking, Spring - partially vanilla behavior
+    x Allow the pogostick to get Mending via books (anvil) - vanilla behavior
+    x Allow the pogostick to get Frost Walker via books (anvil)
+        - Custom implementation of Frost Walker - freeze water where the pogostick lands
+    x Allow the pogostick to get Curse of Vanishing via books (anvil) - vanilla behavior
+    x New enchantment: Spring I/II
+        x Custom implementation of Spring - raises max bounce height (regular height will be lowered)
+ 
+    - Check if potion of speed works as expected
+    - Check if potion of leaping works as expected
+
+
+OBS 1: Vanilla already makes Unbreaking and Mending available to any BREAKABLE item;
+OBS 2: Vanilla already allows Curse of Vanishing on any item; 

@@ -1,7 +1,6 @@
 package sidben.pogostick.util;
 
-import java.util.IllegalFormatPrecisionException;
-import java.util.MissingFormatArgumentException;
+import java.util.IllegalFormatException;
 import org.apache.logging.log4j.Level;
 import net.minecraftforge.fml.common.FMLLog;
 import sidben.pogostick.main.ModConfig;
@@ -16,10 +15,7 @@ public class LogHelper
     {
         try {
             FMLLog.log(Reference.ModID, logLevel, format, data);
-        } catch (final IllegalFormatPrecisionException e) {
-            System.out.println(e);
-            System.out.println(format);
-        } catch (final MissingFormatArgumentException e) {
+        } catch (final IllegalFormatException e) {
             System.out.println(e);
             System.out.println(format);
         }

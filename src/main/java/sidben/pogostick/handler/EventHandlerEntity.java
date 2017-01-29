@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
-import sidben.pogostick.main.Features;
 import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.util.LogHelper;
 import sidben.pogostick.util.PogostickHelper;
@@ -29,7 +28,6 @@ import sidben.pogostick.util.PogostickHelper;
 
 public class EventHandlerEntity
 {
-
 
 
     @SubscribeEvent
@@ -71,18 +69,20 @@ public class EventHandlerEntity
         if (entity.hasCapability(CapabilityPogostick.POGOSTICK, null) && entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick() && distance > 0) {
             final IPogostick pogostickStatus = entity.getCapability(CapabilityPogostick.POGOSTICK, null);
 
+            LogHelper.debug("-/-/- %s  -  distance: %.4f > %.4f", pogostickStatus, distance, pogostickStatus.minDistanceToBounce());
+
 
             // Check if the player is holding the pogostick right now
             ItemStack pogoStack = ItemStack.EMPTY;
-            if (entity.getHeldItemMainhand().getItem() == Features.pogoStick) {
+            if (PogostickHelper.isPogoStack(entity.getHeldItemMainhand())) {
                 pogoStack = entity.getHeldItemMainhand();
-            } else if (entity.getHeldItemOffhand().getItem() == Features.pogoStick) {
+            } else if (PogostickHelper.isPogoStack(entity.getHeldItemOffhand())) {
                 pogoStack = entity.getHeldItemOffhand();
             }
 
 
             // Check if the bounce is valid
-            if (distance > PogostickHelper.MIN_DISTANCE_TO_BOUNCE && pogoStack != ItemStack.EMPTY) {
+            if (distance > pogostickStatus.minDistanceToBounce() && pogoStack != ItemStack.EMPTY) {
 
                 // Negates fall damage (client and server)
                 if (event instanceof LivingFallEvent) {
@@ -145,6 +145,13 @@ public class EventHandlerEntity
     @SubscribeEvent
     public static void onLivingUpdateEvent(LivingUpdateEvent event)
     {
+        /*
+         * if (event.getEntityLiving() instanceof EntityPlayer) {
+         * LogHelper.trace("%s['%s'/%d] - Pos: %.1f, %.1f, %.1f - Server: %s, %s, %s", event.getEntityLiving().getClass().getSimpleName(), event.getEntityLiving().getName(), event.getEntityLiving().getEntityId(),
+         * event.getEntityLiving().posX, event.getEntityLiving().posY, event.getEntityLiving().posZ, event.getEntityLiving().serverPosX, event.getEntityLiving().serverPosY, event.getEntityLiving().serverPosZ);
+         * }
+         */
+
         if (event.getEntityLiving() == null) { return; }
         if (event.getEntityLiving().world.isRemote) { return; }
 
@@ -163,6 +170,15 @@ public class EventHandlerEntity
                 if (entity instanceof EntityPlayer) {
                     NetworkManager.sendPogoStatusUpdate(false, (EntityPlayer) entity);
                 }
+
+            } else {
+                // Special rule for Frost Walking. Only test when the player is falling
+                // OBS: motionY on ground will be -0.07840 due to 'gravity', but I can just check for zero since I also check onGround.
+                if (!entity.onGround && entity.motionY < 0F && entity.hasCapability(CapabilityPogostick.POGOSTICK, null)
+                        && entity.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick()) {
+                    PogostickHelper.tryFrostBounce(entity);
+                }
+
             }
 
         }

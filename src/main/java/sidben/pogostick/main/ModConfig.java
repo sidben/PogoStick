@@ -7,10 +7,18 @@ import net.minecraftforge.common.config.Configuration;
 public class ModConfig
 {
 
-    public static final String  CATEGORY_DEBUG = "debug";
+    private static Configuration _config;
+    private static boolean       _onDebug;
 
-    public static Configuration _config;
-    public static boolean       _onDebug;
+    public static final String   CATEGORY_DEBUG                       = "debug";
+    public static final float    DEFAULT_DISTANCE_LIMITER_FOR_PLAYERS = 2.0F;
+    public static final float    MIN_DISTANCE_TO_START_BOUNCING       = 1.1F;
+    public static final float    MIN_DISTANCE_TO_KEEP_BOUNCING        = 0.3F;
+    public static final float    MIN_MOTION_UP                        = 0.5F;
+    public static final float    MAX_MOTION_UP                        = 10F;
+    public static final float    MIN_DISTANCE_TO_DAMAGE_POGOSTICK     = 3F;
+    public static final int      MAX_DAMAGE_TO_POGOSTICK              = 10;
+    public static final float    MAX_DAMAGE_TO_PLAYER                 = 4F;
 
 
 
