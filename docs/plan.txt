@@ -1,0 +1,6 @@
+Achievements
+
+- Activate pogostick / bounce once
+- Bounce with frost walker
+- Bounce > 100 blocks
+- Kill a monster bouncing
