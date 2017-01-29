@@ -1,8 +1,8 @@
 [
 {
 "modid": "pogostick",
-"name": "Pogo Sticks",
-"description": "Adds a pogo stick.",
+"name": "Pogo Stick",
+"description": "Adds a pogo stick. That's it. Really. A whole mod for just ONE single type of pogo stick. It must be a really good pogo stick.",
 "version": "${version}",
 "mcversion": "${mcversion}",
 "url": "",
