@@ -11,5 +11,9 @@ public interface IPogostick
 
     float minDistanceToBounce();
 
+    float fallDistanceBaseLimit();
+
     boolean bouncedOnce();
+
+    boolean canApplyModifiers();
 }

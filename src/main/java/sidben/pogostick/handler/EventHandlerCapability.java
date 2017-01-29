@@ -5,6 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import sidben.pogostick.capability.CapabilitySerializerPogostick;
+import sidben.pogostick.main.ModConfig;
 import sidben.pogostick.reference.Reference;
 
 
@@ -17,7 +18,7 @@ public class EventHandlerCapability
 
         // TODO: Allow zombies / baby zombies to use pogosticks
         if (event.getEntity() instanceof EntityPlayer) {
-            event.addCapability(new ResourceLocation(Reference.ModID, "pogo"), new CapabilitySerializerPogostick());
+            event.addCapability(new ResourceLocation(Reference.ModID, "pogo"), new CapabilitySerializerPogostick(ModConfig.DEFAULT_DISTANCE_LIMITER_FOR_PLAYERS, true));
         }
 
     }

@@ -15,8 +15,8 @@ public class CapabilitySerializerPogostick implements ICapabilitySerializable<NB
 
 
 
-    public CapabilitySerializerPogostick() {
-        this._capabilityInstance = new CapabilityHandlerPogostick();
+    public CapabilitySerializerPogostick(float distanceLimiterBase, boolean canApplySpeedModifiers) {
+        this._capabilityInstance = new CapabilityHandlerPogostick(distanceLimiterBase, canApplySpeedModifiers);
     }
 
 
