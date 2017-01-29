@@ -75,12 +75,16 @@ public class Features
     // Achievements and Stats
     // -----------------------------------------------------------------------
 
-    public static final StatBase statTimesBounced = new StatBasic("stat.timesBounced", new TextComponentTranslation("pogostick:stat.times_bounced", new Object[0]));
+    public static class Stats 
+    {
+        public static final StatBase TIMES_BOUNCED = new StatBasic("stat.timesBounced", new TextComponentTranslation("pogostick:stat.times_bounced", new Object[0]));
+    }
+    
     
     
     public static void registerStats()
     {
-        statTimesBounced.registerStat();
+        Stats.TIMES_BOUNCED.registerStat();
     }
     
 

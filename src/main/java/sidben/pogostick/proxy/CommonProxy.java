@@ -23,9 +23,6 @@ public abstract class CommonProxy implements IProxy
 
         // Network messages
         NetworkManager.registerMessages();
-
-        // Capabilities
-        CapabilityPogostick.register();
     }
 
 

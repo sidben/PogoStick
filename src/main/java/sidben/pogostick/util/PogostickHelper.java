@@ -100,13 +100,17 @@ public class PogostickHelper
             entity.playSound(SoundEvents.ENTITY_SLIME_JUMP, 0.8F, 0.8F + entity.world.rand.nextFloat() * 0.4F);
 
         } else {
+            // Item damage
             final int damageAmount = PogostickHelper.calculateItemDamage(fallDistance);
             LogHelper.trace("A fall from %.4f will cause %d damage to the pogostick", fallDistance, damageAmount);
             if (damageAmount > 0) {
-                pogoStack.damageItem(damageAmount, entity);
-
-                // TODO: if the damage breaks the pogostick, the remaining damage goes to the player (secret achievement?)
+                pogoStack.damageItem(damageAmount, entity); // TODO: if the damage breaks the pogostick, the remaining damage goes to the player (secret achievement?)
             }
+
+            // Stats
+            if (entity instanceof EntityPlayer) {
+                ((EntityPlayer) entity).addStat(Features.Stats.TIMES_BOUNCED);
+            }            
 
         }
     }
