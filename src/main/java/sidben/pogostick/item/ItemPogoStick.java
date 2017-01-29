@@ -17,6 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import sidben.pogostick.capability.CapabilityPogostick;
 import sidben.pogostick.capability.IPogostick;
+import sidben.pogostick.main.Features;
 import sidben.pogostick.network.NetworkManager;
 import sidben.pogostick.reference.Reference;
 import sidben.pogostick.util.LogHelper;
@@ -112,6 +113,7 @@ public class ItemPogoStick extends Item
             if (shouldEnablePogostick != pogostickStatus.isUsingPogostick()) {
                 pogostickStatus.updatePogostickUsage(shouldEnablePogostick);
                 NetworkManager.sendPogoStatusUpdate(shouldEnablePogostick, playerIn);
+                if (shouldEnablePogostick) { playerIn.addStat(Features.Stats.USE_POGOSTICK); }
             }
 
             // LogHelper.debug("> capability - isUsing (pos, fresh) == %s", playerIn.getCapability(CapabilityPogostick.POGOSTICK, null).isUsingPogostick());
